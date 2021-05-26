@@ -15,6 +15,9 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField]
     float fJumpVelocity = 5;
 
+    [SerializeField]
+    Vector2 GroundedBoxOffset;
+
     Rigidbody2D _rb;
 
     float fJumpPressedRemember = 0;
@@ -41,6 +44,8 @@ public class PlayerMovement : NetworkBehaviour
     [Range(0, 1)]
     float fCutJumpHeight = 0.5f;
 
+    public Transform testT;
+
     public override void NetworkStart()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -56,9 +61,15 @@ public class PlayerMovement : NetworkBehaviour
 
     public void Move()
     {
-        Vector2 v2GroundedBoxCheckPosition = (Vector2)transform.position + new Vector2(0, -0.01f);
+        Vector2 v2GroundedBoxCheckPosition = (Vector2)transform.position + GroundedBoxOffset;//new Vector2(0, -1f);
         Vector2 v2GroundedBoxCheckScale = (Vector2)transform.localScale + new Vector2(-0.02f, 0);
         bool bGrounded = Physics2D.OverlapBox(v2GroundedBoxCheckPosition, v2GroundedBoxCheckScale, 0, lmWalls);
+
+        if(testT)
+        {
+            testT.position = v2GroundedBoxCheckPosition;
+            testT.localScale = v2GroundedBoxCheckScale;
+        }
 
         fGroundedRemember -= Time.deltaTime;
         if (bGrounded)
