@@ -6,6 +6,17 @@ using MLAPI;
 
 public class ConnectionManger : MonoBehaviour
 {
+    [SerializeField]
+    private bool startHost;
+
+    void Start()
+    {
+        if(startHost)
+        {
+            NetworkManager.Singleton.StartHost();
+        }
+    }
+
     void OnGUI()
     {
         GUILayout.BeginArea(new Rect(10, 10, 300, 300));

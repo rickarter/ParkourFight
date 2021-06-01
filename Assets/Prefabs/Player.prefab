@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 5292929731654129446}
   - component: {fileID: 4897427257429046591}
   - component: {fileID: 8312780262316979441}
-  - component: {fileID: 7790948673665867889}
   - component: {fileID: 6427725963081675411}
   - component: {fileID: 4703105012432127438}
   - component: {fileID: 8793705957564001868}
+  - component: {fileID: -2723079136993480037}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -106,54 +106,6 @@ MonoBehaviour:
   PrefabHashGenerator: Player
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
---- !u!114 &7790948673665867889
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873251789699542547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FixedSendsPerSecond: 20
-  AssumeSyncedSends: 1
-  InterpolatePosition: 1
-  SnapDistance: 10
-  InterpolateServer: 1
-  MinMeters: 0.15
-  MinDegrees: 1.5
-  ExtrapolatePosition: 0
-  MaxSendsToExtrapolate: 5
-  Channel: 
-  EnableRange: 0
-  EnableNonProvokedResendChecks: 0
-  DistanceSendrate:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 20
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 500
-      value: 20
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!50 &6427725963081675411
 Rigidbody2D:
   serializedVersion: 4
@@ -171,7 +123,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
@@ -203,20 +155,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83dfde786abcba24abf11b61f6736ffe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lmWalls:
+  moveSpeed: 3000
+  maxSpeed: 15
+  grounded: 0
+  whatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  fSpeed: 0.2
-  fJumpVelocity: 15
-  GroundedBoxOffset: {x: 0, y: -0.55}
-  fJumpPressedRememberTime: 0.2
-  fGroundedRememberTime: 0.25
-  fHorizontalAcceleration: 0.5
-  fHorizontalDampingBasic: 0.5
-  fHorizontalDampingWhenStopping: 0.5
-  fHorizontalDampingWhenTurning: 0.5
-  fCutJumpHeight: 0.5
-  testT: {fileID: 7529419182723546188}
+  counterMovement: 0.175
+  jumpForce: 550
+--- !u!114 &-2723079136993480037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873251789699542547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04ef833b8a9a0414fbff353db0e8556a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5370239785240926179
 GameObject:
   m_ObjectHideFlags: 0

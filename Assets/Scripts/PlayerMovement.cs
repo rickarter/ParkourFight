@@ -8,106 +8,143 @@ using MLAPI.NetworkVariable;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    [SerializeField]
-    LayerMask lmWalls;
-    [SerializeField]
-    float fSpeed = 1;
-    [SerializeField]
-    float fJumpVelocity = 5;
+    //Components
+    private Rigidbody2D rb;
 
-    [SerializeField]
-    Vector2 GroundedBoxOffset;
+    //Movement
+    public float moveSpeed = 4500;
+    public float maxSpeed = 20;
+    public bool grounded;
+    public LayerMask whatIsGround;
 
-    Rigidbody2D _rb;
+    public float counterMovement = 0.175f;
+    private float threshold = 0.01f;
 
-    float fJumpPressedRemember = 0;
-    [SerializeField]
-    float fJumpPressedRememberTime = 0.2f;
+    //Jumping
+    private bool readyToJump = true;
+    private float jumpCooldown = 0.25f;
+    public float jumpForce = 45000;
 
-    float fGroundedRemember = 0;
-    [SerializeField]
-    float fGroundedRememberTime = 0.25f;
+    //Input
+    float x, y;
+    bool jumping, sprinting, crouching;
 
-    [SerializeField]
-    float fHorizontalAcceleration = 1;
-    [SerializeField]
-    [Range(0, 1)]
-    float fHorizontalDampingBasic = 0.5f;
-    [SerializeField]
-    [Range(0, 1)]
-    float fHorizontalDampingWhenStopping = 0.5f;
-    [SerializeField]
-    [Range(0, 1)]
-    float fHorizontalDampingWhenTurning = 0.5f;
-
-    [SerializeField]
-    [Range(0, 1)]
-    float fCutJumpHeight = 0.5f;
-
-    public Transform testT;
-
-    public override void NetworkStart()
+    void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    public void Update()
+    void Update()
+    {
+        InputClientRpc();
+    }
+
+    void FixedUpdate()
+    {   
+        Movement();
+    }
+
+    [ClientRpc]
+    void InputClientRpc()
     {
         if(!IsLocalPlayer) return;
 
-        Move();
+        x = Input.GetAxisRaw("Horizontal");
+        y = Input.GetAxisRaw("Vertical");
+        jumping = Input.GetButton("Jump");
+    }
+
+    void Movement()
+    {
+        //Extra gravity
+        rb.AddForce(Vector3.down * Time.deltaTime * 10);
+
+        Vector2 mag = rb.velocity;
+        CounterMovement(x, y, mag);
+
+        if (readyToJump && jumping) Jump();
+
+        //If speed is larger than maxspeed, cancel out the input so you don't go over max speed
+        if (x > 0 && mag.x > maxSpeed) x = 0;
+        if (x < 0 && mag.x < -maxSpeed) x = 0;
+
+        //Some multipliers
+        float multiplier = 1f;
+        
+        // Movement in air
+        if (!grounded) {
+            multiplier = 0.3f;
+        }
+
+        rb.AddForce(transform.right * x * moveSpeed * multiplier * Time.deltaTime);
         
     }
 
-    public void Move()
+    void CounterMovement(float x, float y, Vector2 mag)
     {
-        Vector2 v2GroundedBoxCheckPosition = (Vector2)transform.position + GroundedBoxOffset;//new Vector2(0, -1f);
-        Vector2 v2GroundedBoxCheckScale = (Vector2)transform.localScale + new Vector2(-0.02f, 0);
-        bool bGrounded = Physics2D.OverlapBox(v2GroundedBoxCheckPosition, v2GroundedBoxCheckScale, 0, lmWalls);
+        if(!grounded || jumping) return;
 
-        if(testT)
+        //CounterMovement
+        if (Mathf.Abs(mag.x) > threshold && Mathf.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0)) 
         {
-            testT.position = v2GroundedBoxCheckPosition;
-            testT.localScale = v2GroundedBoxCheckScale;
+            rb.AddForce(moveSpeed * transform.right * Time.deltaTime * -mag.x * counterMovement);
         }
 
-        fGroundedRemember -= Time.deltaTime;
-        if (bGrounded)
+        //Limit speed
+        rb.velocity = new Vector2(Mathf.Clamp(mag.x, -maxSpeed, maxSpeed), mag.y);
+    }
+
+    void Jump()
+    {   
+        if(grounded && readyToJump)
         {
-            fGroundedRemember = fGroundedRememberTime;
+            readyToJump = false;
+
+            //Add jump forces
+            rb.AddForce(Vector2.up * jumpForce * 1.5f);
+
+            //If jump while falling, reset y velocity
+            Vector2 vel = rb.velocity;
+            if(vel.y < 0.5f)
+                rb.velocity = new Vector2(vel.x, 0);
+            else if(vel.y > 0)
+                rb.velocity = new Vector2(vel.x, vel.y/2);
+
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
+    }
+
+    void ResetJump()
+    {
+        readyToJump = true;
+    }
+
+    private bool cancellingGrounded;
+    void OnCollisionStay2D(Collision2D other)
+    {
+        int layer = other.gameObject.layer;
+        if (whatIsGround != (whatIsGround | (1 << layer))) return;
+
+        for (int i = 0; i < other.contactCount; i++) 
+        {
+            Vector3 normal = other.contacts[i].normal;
+
+            grounded = true;
+            cancellingGrounded = false;
+            CancelInvoke(nameof(StopGrounded));
         }
 
-        fJumpPressedRemember -= Time.deltaTime;
-        if (Input.GetButtonDown("Jump"))
+        //Invoke ground/wall cancel, since we can't check normals with CollisionExit
+        float delay = 3f;
+        if (!cancellingGrounded)
         {
-            fJumpPressedRemember = fJumpPressedRememberTime;
+            cancellingGrounded = true;
+            Invoke(nameof(StopGrounded), Time.deltaTime * delay);
         }
+    }
 
-        if (Input.GetButtonUp("Jump"))
-        {
-            if (_rb.velocity.y > 0)
-            {
-                _rb.velocity = new Vector2(_rb.velocity.x, _rb.velocity.y * fCutJumpHeight);
-            }
-        }
-
-        if ((fJumpPressedRemember > 0) && (fGroundedRemember > 0))
-        {
-            fJumpPressedRemember = 0;
-            fGroundedRemember = 0;
-            _rb.velocity = new Vector2(_rb.velocity.x, fJumpVelocity);
-        }
-
-        float fHorizontalVelocity = _rb.velocity.x;
-        fHorizontalVelocity += Input.GetAxisRaw("Horizontal") * fSpeed;
-
-        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) < 0.01f)
-            fHorizontalVelocity *= Mathf.Pow(1f - fHorizontalDampingWhenStopping, Time.deltaTime * 10f);
-        else if (Mathf.Sign(Input.GetAxisRaw("Horizontal")) != Mathf.Sign(fHorizontalVelocity))
-            fHorizontalVelocity *= Mathf.Pow(1f - fHorizontalDampingWhenTurning, Time.deltaTime * 10f);
-        else
-            fHorizontalVelocity *= Mathf.Pow(1f - fHorizontalDampingBasic, Time.deltaTime * 10f);
-
-        _rb.velocity = new Vector2(fHorizontalVelocity, _rb.velocity.y);
+    void StopGrounded()
+    {
+        grounded = false;
     }
 }
