@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 8312780262316979441}
   - component: {fileID: 6427725963081675411}
   - component: {fileID: 4703105012432127438}
+  - component: {fileID: 1537593666822305937}
   - component: {fileID: 8793705957564001868}
   - component: {fileID: -2723079136993480037}
-  - component: {fileID: 1537593666822305937}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -144,38 +144,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1, y: 2}
   m_Direction: 0
---- !u!114 &8793705957564001868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873251789699542547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83dfde786abcba24abf11b61f6736ffe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3000
-  maxSpeed: 15
-  grounded: 0
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 64
-  counterMovement: 0.175
-  jumpForce: 550
---- !u!114 &-2723079136993480037
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873251789699542547}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04ef833b8a9a0414fbff353db0e8556a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1537593666822305937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,6 +192,38 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8793705957564001868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873251789699542547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83dfde786abcba24abf11b61f6736ffe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 3000
+  maxSpeed: 15
+  grounded: 0
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 64
+  counterMovement: 0.175
+  jumpForce: 550
+--- !u!114 &-2723079136993480037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873251789699542547}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04ef833b8a9a0414fbff353db0e8556a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5370239785240926179
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,11 +23,13 @@ public class PlayerMovement : NetworkBehaviour
     //Jumping
     private bool readyToJump = true;
     private float jumpCooldown = 0.25f;
-    public float jumpForce = 45000;
+    public float jumpForce = 550;
+    public float maxSlopeAngle = 35f; 
+    private Vector3 normalVector = Vector3.up;
 
     //Input
-    float x, y;
-    bool jumping, sprinting, crouching;
+    MyInput input = new MyInput();
+    bool jumping;
 
     void Awake()
     {
@@ -36,33 +38,56 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
-        InputClientRpc();
+        if(!IsLocalPlayer) return;
+        input.InputClientRpc();
+
+        ToggleJumping();
+    }
+
+    private bool hasChanged;
+    void ToggleJumping()
+    {
+        if(input.jumping)
+        {
+            if(!hasChanged) 
+            {
+                jumping = true;
+                hasChanged = true;
+
+                float delay = 0.125f;
+                Invoke(nameof(ResetJumping), delay);
+            }
+        }
+        else
+        {
+            hasChanged = false;
+        }
+    }
+
+    void ResetJumping()
+    {
+        jumping = false;
     }
 
     void FixedUpdate()
     {   
-        Movement();
+        Movement(input);
     }
 
-    [ClientRpc]
-    void InputClientRpc()
+    void Movement(MyInput input)
     {
-        if(!IsLocalPlayer) return;
+        //Read input
+        float x = input.x;
+        float y = input.y;
 
-        x = Input.GetAxisRaw("Horizontal");
-        y = Input.GetAxisRaw("Vertical");
-        jumping = Input.GetButton("Jump");
-    }
-
-    void Movement()
-    {
         //Extra gravity
         rb.AddForce(Vector3.down * Time.deltaTime * 10);
 
         Vector2 mag = rb.velocity;
         CounterMovement(x, y, mag);
 
-        if (readyToJump && jumping) Jump();
+        if (grounded && jumping) Jump();
+        else if(!grounded && jumping) Grab();
 
         //If speed is larger than maxspeed, cancel out the input so you don't go over max speed
         if (x > 0 && mag.x > maxSpeed) x = 0;
@@ -96,7 +121,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void Jump()
     {   
-        if(grounded && readyToJump)
+        if(readyToJump)
         {
             readyToJump = false;
 
@@ -114,9 +139,20 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    void Grab()
+    {
+
+    }
+
     void ResetJump()
     {
         readyToJump = true;
+    }
+
+    bool IsFloor(Vector3 normal)
+    {
+        float angle = Vector3.Angle(Vector3.up, normal);
+        return angle < maxSlopeAngle;
     }
 
     private bool cancellingGrounded;
@@ -129,9 +165,13 @@ public class PlayerMovement : NetworkBehaviour
         {
             Vector3 normal = other.contacts[i].normal;
 
-            grounded = true;
-            cancellingGrounded = false;
-            CancelInvoke(nameof(StopGrounded));
+            if(IsFloor(normal))
+            {
+                normalVector = normal;
+                grounded = true;
+                cancellingGrounded = false;
+                CancelInvoke(nameof(StopGrounded));
+            }
         }
 
         //Invoke ground/wall cancel, since we can't check normals with CollisionExit
