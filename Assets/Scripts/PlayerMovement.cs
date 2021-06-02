@@ -18,6 +18,7 @@ public class PlayerMovement : NetworkBehaviour
     public LayerMask whatIsGround;
 
     public float counterMovement = 0.175f;
+    public float slideCounterMovement = 2f;
     private float threshold = 0.01f;
 
     //Jumping
@@ -25,7 +26,7 @@ public class PlayerMovement : NetworkBehaviour
     private float jumpCooldown = 0.25f;
     public float jumpForce = 550;
     public float maxSlopeAngle = 35f; 
-    private Vector3 normalVector = Vector3.up;
+    private Vector2 normalVector = Vector3.up;
 
     //Grabbing
     private bool readyToGrab = true;
@@ -164,7 +165,7 @@ public class PlayerMovement : NetworkBehaviour
 
         for (int i = 0; i < other.contactCount; i++) 
         {
-            Vector3 normal = other.contacts[i].normal;
+            Vector2 normal = other.contacts[i].normal;
 
             if(IsFloor(normal))
             {
@@ -271,7 +272,7 @@ public class PlayerMovement : NetworkBehaviour
         return closest;
     }
 
-    void OnDrawGizmos()
+    void OnDrawGizmost()
     {
         //Grabbing
         Gizmos.color = Color.cyan;
