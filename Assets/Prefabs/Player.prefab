@@ -212,6 +212,9 @@ MonoBehaviour:
     m_Bits: 64
   counterMovement: 0.175
   jumpForce: 550
+  maxSlopeAngle: 35
+  grabForce: 150
+  grabRadius: 2
 --- !u!114 &-2723079136993480037
 MonoBehaviour:
   m_ObjectHideFlags: 0
