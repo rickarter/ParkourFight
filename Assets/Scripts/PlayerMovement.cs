@@ -109,6 +109,8 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         rb.AddForce(transform.right * x * moveSpeed * multiplier * Time.deltaTime);
+
+        Flip();
         
     }
 
@@ -279,5 +281,12 @@ public class PlayerMovement : NetworkBehaviour
         Gizmos.DrawWireSphere(transform.position, grabRadius);
         Gizmos.DrawSphere(transform.localScale.z*Vector2.down+(Vector2)transform.position, 0.1f);
 
+    }
+
+    void Flip()
+    {
+        Vector3 scale = transform.localScale;
+        if(rb.velocity.x >= 0) transform.localScale = new Vector3(1, scale.y, scale.z);
+        else transform.localScale = new Vector3(-1, scale.y, scale.z);
     }
 }
