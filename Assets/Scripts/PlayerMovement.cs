@@ -6,10 +6,12 @@ using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(PlayerAnimation))]
 public class PlayerMovement : NetworkBehaviour
 {
     //Components
     private Rigidbody2D rb;
+    private PlayerAnimation pa;
 
     //Movement
     public float moveSpeed = 4500;
@@ -32,6 +34,7 @@ public class PlayerMovement : NetworkBehaviour
     private bool readyToGrab = true;
     private float grabCooldown = 1f;
     public float grabForce = 250f;
+    public Vector3 shoulderOffset;
     public float grabRadius = 2f;
 
     //Input
@@ -41,6 +44,7 @@ public class PlayerMovement : NetworkBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        pa = GetComponent<PlayerAnimation>();
     }
 
     void Update()
@@ -194,8 +198,9 @@ public class PlayerMovement : NetworkBehaviour
 
     void Grab()
     {
+        Vector3 shoulderPos = transform.position + shoulderOffset;
         //Load points into a list
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, grabRadius, whatIsGround);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(shoulderPos, grabRadius, whatIsGround);
         List<Vector2> points = new List<Vector2>();
 
         bool hasPoints = false;
@@ -219,7 +224,7 @@ public class PlayerMovement : NetworkBehaviour
         Vector2 headPos = (Vector2)transform.position + transform.localScale.y * Vector2.up;
         Vector2 distance = grabPoint - legPos;
 
-        float verticalForce = distance.y > 0 ? 8*distance.y/Mathf.Pow(0.1f, 2) : 0;
+        float verticalForce = distance.y > 0 ? 2.5f*distance.y/Mathf.Pow(0.1f, 2) : 0;
         float horizontalForce = 2*distance.x/Mathf.Pow(0.1f, 2);
         Vector2 vel = rb.velocity;
         Vector2 force = new Vector2(horizontalForce, verticalForce) * 1.5f;
@@ -227,13 +232,16 @@ public class PlayerMovement : NetworkBehaviour
         //Recall if the point isn't reachable
         RaycastHit2D bottomHit = Physics2D.Raycast(legPos, Vector2.down, grabRadius, whatIsGround);
         RaycastHit2D ceilingHit = Physics2D.Raycast(headPos, Vector2.up, grabRadius, whatIsGround);
-        bool stopCondition = Vector2.Distance(transform.position, grabPoint) > grabRadius 
+        bool stopCondition = Vector2.Distance(shoulderPos, grabPoint) > grabRadius 
         || !hasPoints
         || bottomHit
         || ceilingHit
         || (Mathf.Sign(input.x) != Mathf.Sign(distance.x) && input.x != 0);
 
         if(stopCondition) return;
+        //Call animation
+        pa.GrabAnimation(grabPoint);
+
         rb.velocity = new Vector2(vel.x * 0.5f, 0);
         rb.AddForce(force);
 
@@ -274,19 +282,19 @@ public class PlayerMovement : NetworkBehaviour
         return closest;
     }
 
-    void OnDrawGizmost()
-    {
-        //Grabbing
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, grabRadius);
-        Gizmos.DrawSphere(transform.localScale.z*Vector2.down+(Vector2)transform.position, 0.1f);
-
-    }
-
     void Flip()
     {
         Vector3 scale = transform.localScale;
         if(rb.velocity.x >= 0) transform.localScale = new Vector3(1, scale.y, scale.z);
         else transform.localScale = new Vector3(-1, scale.y, scale.z);
+    }
+
+    void OnDrawGizmost()
+    {
+        //Grabbing
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position + shoulderOffset, grabRadius);
+        Gizmos.DrawSphere(transform.localScale.z*Vector2.down+(Vector2)transform.position, 0.1f);
+
     }
 }
