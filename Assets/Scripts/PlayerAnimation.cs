@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAnimation : MonoBehaviour
+using MLAPI;
+
+public class PlayerAnimation : NetworkBehaviour
 {
     //Components
     private NetworkPlayer player;

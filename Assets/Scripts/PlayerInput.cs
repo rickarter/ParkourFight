@@ -4,6 +4,7 @@ using UnityEngine;
 
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
 
 public class PlayerInput : NetworkBehaviour
 {
@@ -20,7 +21,14 @@ public class PlayerInput : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!IsLocalPlayer) return;
-        input.InputClientRpc();
+        if(!player.IsLocalPlayer) return;
+        SendInputServerRpc(input);
+        input.Input();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SendInputServerRpc(MyInput input)
+    {
+        this.input = input;
     }
 }

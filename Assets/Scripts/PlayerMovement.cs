@@ -5,6 +5,7 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
+using MLAPI.NetworkVariable.Collections;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(PlayerAnimation))]
 public class PlayerMovement : NetworkBehaviour
@@ -39,14 +40,28 @@ public class PlayerMovement : NetworkBehaviour
     //Input
     bool jumping;
 
+    //Netowrk
+    // public List<InputMessage> inputMessages = new List<InputMessage>();
+    public NetworkList<InputMessage> inputMessages = new NetworkList<InputMessage>(new NetworkVariableSettings()
+    {
+        ReadPermission = NetworkVariablePermission.OwnerOnly,
+        WritePermission = NetworkVariablePermission.ServerOnly
+    }, new List<InputMessage>());
+    private int tickNumber = 1;
+
     void Awake()
     {
         player = GetComponent<NetworkPlayer>();
-    }
+    }  
 
     void Update()
     {
         ToggleJumping();
+    }
+
+    void FixedUpdate()
+    {   
+        Movement(player.playerInput.input);
     }
 
     private bool hasChanged;
@@ -72,11 +87,6 @@ public class PlayerMovement : NetworkBehaviour
     void ResetJumping()
     {
         jumping = false;
-    }
-
-    void FixedUpdate()
-    {   
-        Movement(player.playerInput.input);
     }
 
     void Movement(MyInput input)
@@ -280,5 +290,61 @@ public class PlayerMovement : NetworkBehaviour
         Gizmos.DrawWireSphere(transform.position + shoulderOffset, grabRadius);
         Gizmos.DrawSphere(transform.localScale.z*Vector2.down+(Vector2)transform.position, 0.1f);
 
+    }
+
+    void ClientUpdate()
+    {           
+        if(!IsLocalPlayer) return;
+        MyInput input = player.playerInput.input;
+        
+        SendInputMessageServerRpc(new InputMessage
+        {
+            x = input.x,
+            y = input.y,
+            jumping = input.jumping,
+            tickNumber = this.tickNumber
+        });
+
+        Movement(input);
+
+        tickNumber++;    
+
+        Physics2D.Simulate(Time.fixedDeltaTime);
+    }
+
+    /*<summary>
+    Worst code ever
+    </summary>*/
+    void ServerUpdate()
+    {
+        MyInput input = new MyInput();
+        if(HasAvailiableInputMessages())
+        {
+            foreach(InputMessage inputMessage in inputMessages)
+            {
+                input.x = inputMessage.x;
+                input.y = inputMessage.y;
+                input.jumping = inputMessage.jumping;
+
+                Movement(input);
+                Physics.Simulate(Time.fixedDeltaTime);
+            }
+        }
+        else
+        {
+            Movement(input);
+            Physics.Simulate(Time.fixedDeltaTime);
+        }
+    }
+
+    [ServerRpc]
+    void SendInputMessageServerRpc(InputMessage inputMessage)
+    {
+        inputMessages.Add(inputMessage);
+    }
+
+    bool HasAvailiableInputMessages()
+    {
+        return inputMessages.Count > 0;
     }
 }
