@@ -5,15 +5,31 @@ using UnityEngine;
 public class PlayerAnimation : MonoBehaviour
 {
     //Components
+    private NetworkPlayer player;
+
     public Animator animator;
     private Rigidbody2D rb;
 
     //Asignables
+    //Inverse kinematics
     public Transform overridenFrontArmEffector;
     public Transform frontArmEffector;
 
     public Transform overridenBackArmEffector;
     public Transform backArmEffector;
+
+    public Transform overidenFrontLegEffector;
+    public Transform frontLegEffector;
+
+    public Transform overridenBackLegEffector;
+    public Transform BackLegEffector;
+
+    //Animations
+    private string currentState = string.Empty;
+    const string IDLE = "Idle";
+    const string RUN = "Run";
+    const string JUMP = "Jump";
+    const string FLOATING = "Floating";
 
     //Grabing
     private bool grab = false;
@@ -21,7 +37,7 @@ public class PlayerAnimation : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        player = GetComponent<NetworkPlayer>();
     }
 
     // Update is called once per frame
@@ -38,7 +54,15 @@ public class PlayerAnimation : MonoBehaviour
 
     void Animate()
     {
-        
+        Flip();
+
+        string newState = currentState;
+        bool isMoving = Mathf.Abs(player.rigidBody.velocity.x) > 0.05f && player.playerInput.input.x != 0;
+        if(isMoving && player.playerMovement.grounded) newState = RUN;
+        else if(!isMoving && player.playerMovement.grounded) newState = IDLE;
+        else if(!player.playerMovement.grounded) newState = FLOATING;
+
+        SetAnimationState(newState);
     }
 
     void OverrideAnimation()
@@ -71,4 +95,22 @@ public class PlayerAnimation : MonoBehaviour
         frontArmEffector.parent.gameObject.SetActive(false);
         backArmEffector.parent.gameObject.SetActive(false);
     }
+
+    void SetAnimationState(string newState)
+    {
+        if(newState == currentState) return;
+        currentState = newState;
+
+        animator.Play(newState);
+    }
+
+    void Flip()
+    {
+        if(player.playerInput.input.x == 0) return;
+        
+        Vector3 scale = transform.localScale;
+        if(player.rigidBody.velocity.x >= 0) transform.localScale = new Vector3(1, scale.y, scale.z);
+        else transform.localScale = new Vector3(-1, scale.y, scale.z);
+    }
+
 }
