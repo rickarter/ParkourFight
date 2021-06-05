@@ -22,13 +22,13 @@ public class PlayerInput : NetworkBehaviour
     void Update()
     {
         if(!player.IsLocalPlayer) return;
-        SendInputServerRpc(input);
+        // SendInputServerRpc(input);
         input.Input();
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    /*[ServerRpc(RequireOwnership = false)]
     void SendInputServerRpc(MyInput input)
     {
         this.input = input;
-    }
+    }*/
 }

@@ -139,7 +139,8 @@ GameObject:
   - component: {fileID: 4703105012432127438}
   - component: {fileID: 8793705957564001868}
   - component: {fileID: -3449654334823481134}
-  - component: {fileID: -1847929524659497031}
+  - component: {fileID: 58525976669110928}
+  - component: {fileID: -5362003886318898524}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -262,7 +263,19 @@ MonoBehaviour:
   frontLegEffector: {fileID: 0}
   overridenBackLegEffector: {fileID: 0}
   BackLegEffector: {fileID: 0}
---- !u!114 &-1847929524659497031
+--- !u!114 &58525976669110928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873251789699542547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 119fd47ef0bb2d245bb7cc4efddc1a4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-5362003886318898524
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -276,7 +289,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 6427725963081675411}
   playerMovement: {fileID: 8793705957564001868}
-  playerInput: {fileID: 0}
+  playerInput: {fileID: 58525976669110928}
   playerAnimation: {fileID: -3449654334823481134}
 --- !u!1 &1107844983531279689
 GameObject:
