@@ -18,7 +18,7 @@ public class MyInput : INetworkSerializable
         jumping = UnityEngine.Input.GetButton("Jump");
     }
 
-    // [ClientRpc]
+    [ClientRpc]
     public void InputClientRpc()
     {
         Input();

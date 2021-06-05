@@ -11,6 +11,7 @@ public struct StateMessage : INetworkSerializable
     public Vector2 velocity;
     public float angularVelocity;
     public int tickNumber;
+    public MyInput input;
 
     public void NetworkSerialize(NetworkSerializer serializer)
     {

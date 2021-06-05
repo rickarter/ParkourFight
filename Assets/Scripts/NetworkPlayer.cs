@@ -53,9 +53,27 @@ public class NetworkPlayer : NetworkBehaviour
             jumping = input.jumping
         });
 
-        playerMovement.Movement(input);
+        if(lastStateRead < stateMessages.Count)
+        {
+            StateMessage message = stateMessages[lastStateRead];
+            Vector2 difference = message.position - rigidBody.position;
 
-        Physics2D.Simulate(Time.fixedDeltaTime);
+            float distance = difference.magnitude;
+
+            if(distance > 2.0f)
+                rigidBody.position = message.position;
+            else if(distance > 0.1f)
+                rigidBody.position += difference * 0.1f;
+
+            rigidBody.velocity = message.velocity;
+            playerInput.input = message.input;
+
+            //To sync animations
+
+            lastStateRead++;
+        }
+
+        // Physics2D.Simulate(Time.fixedDeltaTime);
     }
 
     void ServerUpdate()
@@ -69,13 +87,23 @@ public class NetworkPlayer : NetworkBehaviour
             input.y = message.y;
             input.jumping = message.jumping;
 
+            //To sync animations
             playerInput.input = input;
 
             lastInputRead++;
         }
 
         playerMovement.Movement(input);
-        Physics2D.Simulate(Time.fixedDeltaTime);
+
+        SendStateClientRpc(new StateMessage()
+        {
+            position = rigidBody.position,
+            rotation = rigidBody.rotation,
+            velocity = rigidBody.velocity,
+            angularVelocity = rigidBody.angularVelocity,
+            tickNumber = tickNumber,
+        }, input);
+        // Physics2D.Simulate(Time.fixedDeltaTime);
     }
 
     [ServerRpc]
@@ -85,8 +113,9 @@ public class NetworkPlayer : NetworkBehaviour
     }
 
     [ClientRpc]
-    void SendStateClientRpc(StateMessage message)
+    void SendStateClientRpc(StateMessage message, MyInput input)
     {
+        message.input = input;
         stateMessages.Add(message);
     }
 }
