@@ -86,14 +86,11 @@ public class NetworkPlayer : NetworkBehaviour
 
         if(HasAvailiableStateMessages())
         {
-            int bufferSlot = lastStateReadTick  % bufferLength;
-            StateMessage message = stateMessages[bufferSlot];
-
-            print(stateMessages[bufferSlot+1].velocity);
+            int bufferSlot = lastStateReadTick % bufferLength;
+            StateMessage message = stateMessages[bufferSlot];   
 
             Vector2 difference = message.position - rigidBody.position;
             float distance = difference.magnitude;
-
             if(IsLocalPlayer)
             {
                 if(distance > 4)
@@ -107,10 +104,10 @@ public class NetworkPlayer : NetworkBehaviour
                     rigidBody.position = message.position;
                 else if(distance > 0.1f)
                     rigidBody.position += difference * 0.1f;
-
                 rigidBody.velocity = message.velocity;
                 playerInput.input = message.input;
             }
+
             lastStateReadTick++;
         }
     }
@@ -128,23 +125,21 @@ public class NetworkPlayer : NetworkBehaviour
             input.y = message.y;
             input.jumping = message.jumping;
 
-            print(input.x);
-
             playerInput.input = input;
+
+            playerMovement.Movement(input);
+
+            SendStateClientRpc(new StateMessage()
+            {
+                position = rigidBody.position,
+                rotation = rigidBody.rotation,
+                velocity = rigidBody.velocity,
+                angularVelocity = rigidBody.angularVelocity,
+                tickNumber = lastInputReadTick,
+            }, input);
 
             lastInputReadTick++;
         }
-
-        playerMovement.Movement(input);
-
-        SendStateClientRpc(new StateMessage()
-        {
-            position = rigidBody.position,
-            rotation = rigidBody.rotation,
-            velocity = rigidBody.velocity,
-            angularVelocity = rigidBody.angularVelocity,
-            tickNumber = tickNumber,
-        }, input);
     }
 
     [ServerRpc]
