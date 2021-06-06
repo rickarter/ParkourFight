@@ -1,6 +1,7 @@
-    using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using MLAPI;
 using MLAPI.Messaging;
@@ -16,11 +17,17 @@ public class NetworkPlayer : NetworkBehaviour
     public PlayerAnimation playerAnimation;
 
     //Network
-    private List<InputMessage> inputMessages = new List<InputMessage>();
-    private List<StateMessage> stateMessages = new List<StateMessage>();
+    const int bufferLength = 1024;
+    private InputMessage[] inputBuffer = new InputMessage[bufferLength];
+    private StateMessage[] stateBuffer = new StateMessage[bufferLength];
+
+    private InputMessage[] inputMessages = new InputMessage[bufferLength];
+    private StateMessage[] stateMessages = new StateMessage[bufferLength];
     private int tickNumber = 0;
-    private int lastInputRead = 0;
-    private int lastStateRead = 0;
+    private int lastInputWriteTick = 0;
+    private int lastInputReadTick = 0;
+    private int lastStateWriteTick = 0;
+    private int lastStateReadTick = 0;
 
     void Reset()
     {
@@ -33,6 +40,7 @@ public class NetworkPlayer : NetworkBehaviour
     void Start()
     {
         Reset();
+        CreateFixingScene();
     }
 
     // Update is called once per frame
@@ -46,51 +54,77 @@ public class NetworkPlayer : NetworkBehaviour
     {
         MyInput input = playerInput.input;
 
-        if(IsLocalPlayer) SendInputServerRpc(new InputMessage()
+        if(IsLocalPlayer)
         {
-            x = input.x,
-            y = input.y,
-            jumping = input.jumping
-        });
+            InputMessage inputMessage = new InputMessage()
+            {
+                x = input.x,
+                y = input.y,
+                jumping = input.jumping,
+                tickNumber = tickNumber
+            };
+            SendInputServerRpc(inputMessage);
 
-        if(lastStateRead < stateMessages.Count)
-        {
-            StateMessage message = stateMessages[lastStateRead];
-            Vector2 difference = message.position - rigidBody.position;
+            playerMovement.Movement(input);
 
-            float distance = difference.magnitude;
+            int bufferSlot = tickNumber % bufferLength;
+            inputBuffer[bufferSlot] = inputMessage;
+            stateBuffer[bufferSlot] = new StateMessage()
+            {
+                position = rigidBody.position,
+                rotation = rigidBody.rotation,
+                velocity = rigidBody.velocity,
+                angularVelocity = rigidBody.angularVelocity,
+                tickNumber = tickNumber,
+            };
 
-            if(distance > 2.0f)
-                rigidBody.position = message.position;
-            else if(distance > 0.1f)
-                rigidBody.position += difference * 0.1f;
-
-            rigidBody.velocity = message.velocity;
-            playerInput.input = message.input;
-
-            //To sync animations
-
-            lastStateRead++;
+            tickNumber++;
         }
 
-        // Physics2D.Simulate(Time.fixedDeltaTime);
+        if(HasAvailiableStateMessages())
+        {
+            int bufferSlot = lastStateReadTick % bufferLength;
+            StateMessage message = stateMessages[bufferSlot];
+
+            Vector2 difference = message.position - rigidBody.position;
+            float distance = difference.magnitude;
+
+            if(IsLocalPlayer)
+            {
+                if(distance > 4)
+                {
+                    rigidBody.position = message.position;
+                }
+            }
+            else
+            {
+                if(distance > 2.0f)
+                    rigidBody.position = message.position;
+                else if(distance > 0.1f)
+                    rigidBody.position += difference * 0.1f;
+
+                rigidBody.velocity = message.velocity;
+                playerInput.input = message.input;
+            }
+        }
     }
 
     void ServerUpdate()
     {
         MyInput input = new MyInput();
 
-        if(lastInputRead < inputMessages.Count)
+        if(HasAvailiableInputMessages())
         {
-            InputMessage message = inputMessages[lastInputRead];
+            int bufferSlot = lastInputReadTick % bufferLength;
+            InputMessage message = inputMessages[bufferSlot];
+
             input.x = message.x;
             input.y = message.y;
             input.jumping = message.jumping;
 
-            //To sync animations
             playerInput.input = input;
 
-            lastInputRead++;
+            lastInputReadTick++;
         }
 
         playerMovement.Movement(input);
@@ -103,19 +137,46 @@ public class NetworkPlayer : NetworkBehaviour
             angularVelocity = rigidBody.angularVelocity,
             tickNumber = tickNumber,
         }, input);
-        // Physics2D.Simulate(Time.fixedDeltaTime);
     }
 
     [ServerRpc]
     void SendInputServerRpc(InputMessage message)
     {
-        inputMessages.Add(message);
+        inputMessages[message.tickNumber % bufferLength] = message;
+        lastInputWriteTick++;
     }
 
     [ClientRpc]
     void SendStateClientRpc(StateMessage message, MyInput input)
     {
         message.input = input;
-        stateMessages.Add(message);
+        stateMessages[message.tickNumber % bufferLength] = message;
+        lastStateWriteTick++;
+    }
+
+    bool HasAvailiableInputMessages()
+    {
+        return lastInputReadTick < lastInputWriteTick;
+    }
+
+    bool HasAvailiableStateMessages()
+    {
+        return lastStateReadTick < lastStateWriteTick;
+    }
+
+    void CreateFixingScene()
+    {
+        if(!IsLocalPlayer) return;
+
+        Scene fixingScene = SceneManager.CreateScene(
+            "FixingScene",
+            new CreateSceneParameters(LocalPhysicsMode.Physics2D)
+        );
+        PhysicsScene2D physicsScene2D = fixingScene.GetPhysicsScene2D();
+
+        GameObject level = GameObject.FindGameObjectWithTag("Level");
+
+        SceneManager.MoveGameObjectToScene(level, fixingScene);
+
     }
 }

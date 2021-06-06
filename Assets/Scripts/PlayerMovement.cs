@@ -192,6 +192,8 @@ public class PlayerMovement : NetworkBehaviour
 
     void Grab()
     {
+        if(!readyToGrab) return;
+        
         Vector3 shoulderPos = transform.position + shoulderOffset;
         //Load points into a list
         Collider2D[] colliders = Physics2D.OverlapCircleAll(shoulderPos, grabRadius, whatIsGround);
