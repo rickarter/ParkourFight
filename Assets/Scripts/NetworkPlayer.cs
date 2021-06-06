@@ -68,8 +68,6 @@ public class NetworkPlayer : NetworkBehaviour
             };
             SendInputServerRpc(inputMessage);
 
-            playerMovement.Movement(input);
-
             int bufferSlot = tickNumber % bufferLength;
             inputBuffer[bufferSlot] = inputMessage;
             stateBuffer[bufferSlot] = new StateMessage()
@@ -81,6 +79,8 @@ public class NetworkPlayer : NetworkBehaviour
                 tickNumber = tickNumber,
             };
 
+            playerMovement.Movement(input);
+
             tickNumber++;
         }
 
@@ -89,7 +89,7 @@ public class NetworkPlayer : NetworkBehaviour
             int bufferSlot = lastStateReadTick  % bufferLength;
             StateMessage message = stateMessages[bufferSlot];
 
-            print(stateMessages[bufferSlot+1].velocity);
+            // print(lastStateReadTick.ToString() + " -- " + lastStateWriteTick.ToString());
 
             Vector2 difference = message.position - rigidBody.position;
             float distance = difference.magnitude;
