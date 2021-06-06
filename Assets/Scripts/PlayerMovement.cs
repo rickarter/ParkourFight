@@ -89,7 +89,7 @@ public class PlayerMovement : NetworkBehaviour
         ToggleJumping(input.jumping);
 
         //Extra gravity
-        player.rigidBody.AddForce(Vector3.down * Time.deltaTime * 10);
+        player.rigidBody.AddForce(Vector3.down * 10 * 0.0166f);
 
         Vector2 mag = player.rigidBody.velocity;
         CounterMovement(x, y, mag);
@@ -119,7 +119,7 @@ public class PlayerMovement : NetworkBehaviour
         //CounterMovement
         if (Mathf.Abs(mag.x) > threshold && Mathf.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0)) 
         {
-            player.rigidBody.AddForce(moveSpeed * transform.right * Time.deltaTime * -mag.x * counterMovement);
+            player.rigidBody.AddForce(moveSpeed * transform.right * -mag.x * counterMovement);
         }
 
         //Limit speed

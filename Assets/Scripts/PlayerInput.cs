@@ -22,13 +22,6 @@ public class PlayerInput : NetworkBehaviour
     void Update()
     {
         if(!player.IsLocalPlayer) return;
-        // SendInputServerRpc(input);
         input.Input();
     }
-
-    /*[ServerRpc(RequireOwnership = false)]
-    void SendInputServerRpc(MyInput input)
-    {
-        this.input = input;
-    }*/
 }

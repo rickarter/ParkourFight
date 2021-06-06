@@ -23,8 +23,7 @@ public class MyInput : INetworkSerializable
     {
         Input();
     }
-
-    // INetworkSerializable
+    
     public void NetworkSerialize(NetworkSerializer serializer)
     {
         serializer.Serialize(ref x);

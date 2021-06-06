@@ -29,6 +29,9 @@ public class NetworkPlayer : NetworkBehaviour
     private int lastStateWriteTick = 0;
     private int lastStateReadTick = 0;
 
+    private Scene sceneClone;
+    private PhysicsScene2D physicsScene2D;
+
     void Reset()
     {
         rigidBody = GetComponent<Rigidbody2D>();
@@ -40,7 +43,7 @@ public class NetworkPlayer : NetworkBehaviour
     void Start()
     {
         Reset();
-        CreateFixingScene();
+        CreateCloneScene();
     }
 
     // Update is called once per frame
@@ -83,8 +86,10 @@ public class NetworkPlayer : NetworkBehaviour
 
         if(HasAvailiableStateMessages())
         {
-            int bufferSlot = lastStateReadTick % bufferLength;
+            int bufferSlot = lastStateReadTick  % bufferLength;
             StateMessage message = stateMessages[bufferSlot];
+
+            print(stateMessages[bufferSlot+1].velocity);
 
             Vector2 difference = message.position - rigidBody.position;
             float distance = difference.magnitude;
@@ -106,6 +111,7 @@ public class NetworkPlayer : NetworkBehaviour
                 rigidBody.velocity = message.velocity;
                 playerInput.input = message.input;
             }
+            lastStateReadTick++;
         }
     }
 
@@ -121,6 +127,8 @@ public class NetworkPlayer : NetworkBehaviour
             input.x = message.x;
             input.y = message.y;
             input.jumping = message.jumping;
+
+            print(input.x);
 
             playerInput.input = input;
 
@@ -164,19 +172,19 @@ public class NetworkPlayer : NetworkBehaviour
         return lastStateReadTick < lastStateWriteTick;
     }
 
-    void CreateFixingScene()
+    void CreateCloneScene()
     {
         if(!IsLocalPlayer) return;
 
-        Scene fixingScene = SceneManager.CreateScene(
-            "FixingScene",
+        sceneClone = SceneManager.CreateScene(
+            "CloneScene",
             new CreateSceneParameters(LocalPhysicsMode.Physics2D)
         );
-        PhysicsScene2D physicsScene2D = fixingScene.GetPhysicsScene2D();
+        physicsScene2D = sceneClone.GetPhysicsScene2D();
 
-        GameObject level = GameObject.FindGameObjectWithTag("Level");
+        GameObject level = Instantiate(GameObject.FindGameObjectWithTag("Level"));
 
-        SceneManager.MoveGameObjectToScene(level, fixingScene);
+        SceneManager.MoveGameObjectToScene(level, sceneClone);
 
-    }
+     }
 }
