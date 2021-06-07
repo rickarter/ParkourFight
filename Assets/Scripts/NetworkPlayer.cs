@@ -76,6 +76,8 @@ public class NetworkPlayer : NetworkBehaviour
             };
             SendInputServerRpc(inputMessage);
 
+            playerMovement.Movement(input);
+
             int bufferSlot = tickNumber % bufferLength;
             inputBuffer[bufferSlot] = inputMessage;
             stateBuffer[bufferSlot] = new StateMessage()
@@ -86,8 +88,6 @@ public class NetworkPlayer : NetworkBehaviour
                 angularVelocity = rigidBody.angularVelocity,
                 tickNumber = tickNumber,
             };
-
-            playerMovement.Movement(input);
 
             tickNumber++;
         }
@@ -140,6 +140,9 @@ public class NetworkPlayer : NetworkBehaviour
                         rigidBody.position = Vector2.Lerp(rigidBody.position, dummyRigidbody.position, 0.1f);
                         rigidBody.velocity = dummyRigidbody.velocity;
                     }
+
+                    // rigidBody.position = dummyRigidbody.position;
+                    // rigidBody.velocity = dummyRigidbody.velocity;
 
                     Destroy(dummy);
                 }
