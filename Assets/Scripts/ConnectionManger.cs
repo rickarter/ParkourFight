@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+ using UnityEngine.SceneManagement;
+
 using MLAPI;
 
 public class ConnectionManger : MonoBehaviour
@@ -76,6 +78,8 @@ public class ConnectionManger : MonoBehaviour
             {
                 NetworkManager.Singleton.StopServer();
             }
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }

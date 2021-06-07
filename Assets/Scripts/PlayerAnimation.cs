@@ -109,7 +109,7 @@ public class PlayerAnimation : NetworkBehaviour
     void Flip()
     {
         if(player.playerInput.input.x == 0) return;
-        
+
         Vector3 scale = transform.localScale;
         if(player.rigidBody.velocity.x >= 0) transform.localScale = new Vector3(1, scale.y, scale.z);
         else transform.localScale = new Vector3(-1, scale.y, scale.z);
