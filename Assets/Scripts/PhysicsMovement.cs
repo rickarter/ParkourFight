@@ -7,11 +7,10 @@ using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using MLAPI.NetworkVariable.Collections;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(PlayerAnimation))]
-public class PlayerMovement : NetworkBehaviour
+public class PhysicsMovement : MonoBehaviour
 {
     //Components
-    private NetworkPlayer player;
+    public Rigidbody2D rb;
 
     //Movement
     public float moveSpeed = 4500;
@@ -41,20 +40,14 @@ public class PlayerMovement : NetworkBehaviour
     [HideInInspector]
     public bool jumping;
 
-    void Start()
+    /*void FixedUpdate()
     {
-        player = GetComponent<NetworkPlayer>();
-    }  
-
-    void Update()
-    {
-
-    }
-
-    void FixedUpdate()
-    {   
-
-    }
+        MyInput input = new MyInput();
+        input.x = UnityEngine.Input.GetAxisRaw("Horizontal");
+        input.y = UnityEngine.Input.GetAxisRaw("Vertical");
+        input.jumping = UnityEngine.Input.GetButton("Jump");
+        Movement(input);
+    }*/
 
     private bool hasChanged;
     void ToggleJumping(bool jumping)
@@ -89,9 +82,9 @@ public class PlayerMovement : NetworkBehaviour
         ToggleJumping(input.jumping);
 
         //Extra gravity
-        player.rigidBody.AddForce(Vector3.down * 10 * 0.0166f);
+        rb.AddForce(Vector3.down * 10 * 0.0166f);
 
-        Vector2 mag = player.rigidBody.velocity;
+        Vector2 mag = rb.velocity;
         CounterMovement(x, y, mag);
 
         if (grounded && jumping) Jump();
@@ -109,7 +102,7 @@ public class PlayerMovement : NetworkBehaviour
             multiplier = 0.3f;
         }
 
-        player.rigidBody.AddForce(transform.right * x * moveSpeed * multiplier * Time.deltaTime);        
+        rb.AddForce(transform.right * x * moveSpeed * multiplier * Time.deltaTime);        
     }
 
     void CounterMovement(float x, float y, Vector2 mag)
@@ -119,11 +112,11 @@ public class PlayerMovement : NetworkBehaviour
         //CounterMovement
         if (Mathf.Abs(mag.x) > threshold && Mathf.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0)) 
         {
-            player.rigidBody.AddForce(moveSpeed * transform.right * -mag.x * counterMovement);
+            rb.AddForce(moveSpeed * transform.right * -mag.x * counterMovement);
         }
 
         //Limit speed
-        player.rigidBody.velocity = new Vector2(Mathf.Clamp(mag.x, -maxSpeed, maxSpeed), mag.y);
+        rb.velocity = new Vector2(Mathf.Clamp(mag.x, -maxSpeed, maxSpeed), mag.y);
     }
 
     void Jump()
@@ -133,14 +126,14 @@ public class PlayerMovement : NetworkBehaviour
             readyToJump = false;
 
             //Add jump forces
-            player.rigidBody.AddForce(Vector2.up * jumpForce * 1.5f);
+            rb.AddForce(Vector2.up * jumpForce * 1.5f);
 
             //If jump while falling, reset y velocity
-            Vector2 vel = player.rigidBody.velocity;
+            Vector2 vel = rb.velocity;
             if(vel.y < 0.5f)
-                player.rigidBody.velocity = new Vector2(vel.x, 0);
+                rb.velocity = new Vector2(vel.x, 0);
             else if(vel.y > 0)
-                player.rigidBody.velocity = new Vector2(vel.x, vel.y/2);
+                rb.velocity = new Vector2(vel.x, vel.y/2);
 
             Invoke(nameof(ResetJump), jumpCooldown);
         }
@@ -158,6 +151,7 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     private bool cancellingGrounded;
+
     void OnCollisionStay2D(Collision2D other)
     {
         int layer = other.gameObject.layer;
@@ -221,7 +215,7 @@ public class PlayerMovement : NetworkBehaviour
 
         float verticalForce = distance.y > 0 ? 2.5f*distance.y/Mathf.Pow(0.1f, 2) : 0;
         float horizontalForce = 2*distance.x/Mathf.Pow(0.1f, 2);
-        Vector2 vel = player.rigidBody.velocity;
+        Vector2 vel = rb.velocity;
         Vector2 force = new Vector2(horizontalForce, verticalForce) * 1.5f;
         
         //Recall if the point isn't reachable
@@ -234,11 +228,9 @@ public class PlayerMovement : NetworkBehaviour
         || (Mathf.Sign(input.x) != Mathf.Sign(distance.x) && input.x != 0);
 
         if(stopCondition) return;
-        //Call animation
-        player.playerAnimation.GrabAnimation(grabPoint);
 
-        player.rigidBody.velocity = new Vector2(vel.x * 0.5f, 0);
-        player.rigidBody.AddForce(force);
+        rb.velocity = new Vector2(vel.x * 0.5f, 0);
+        rb.AddForce(force);
 
         readyToGrab = false;
         readyToJump = false;

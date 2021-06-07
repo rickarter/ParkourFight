@@ -15,6 +15,7 @@ public class NetworkPlayer : NetworkBehaviour
     public PlayerMovement playerMovement;
     public PlayerInput playerInput;
     public PlayerAnimation playerAnimation;
+    public  GameObject playerDummy;
 
     //Network
     const int bufferLength = 1024;
@@ -32,7 +33,7 @@ public class NetworkPlayer : NetworkBehaviour
     private Scene sceneClone;
     private PhysicsScene2D physicsScene2D;
 
-    void Reset()
+    void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
         playerMovement = GetComponent<PlayerMovement>();
@@ -42,7 +43,6 @@ public class NetworkPlayer : NetworkBehaviour
 
     void Start()
     {
-        Reset();
         CreateCloneScene();
     }
 
@@ -68,8 +68,6 @@ public class NetworkPlayer : NetworkBehaviour
             };
             SendInputServerRpc(inputMessage);
 
-            playerMovement.Movement(input);
-
             int bufferSlot = tickNumber % bufferLength;
             inputBuffer[bufferSlot] = inputMessage;
             stateBuffer[bufferSlot] = new StateMessage()
@@ -80,6 +78,8 @@ public class NetworkPlayer : NetworkBehaviour
                 angularVelocity = rigidBody.angularVelocity,
                 tickNumber = tickNumber,
             };
+
+            playerMovement.Movement(input);
 
             tickNumber++;
         }
@@ -95,7 +95,34 @@ public class NetworkPlayer : NetworkBehaviour
             {
                 if(distance > 4)
                 {
-                    rigidBody.position = message.position;
+                    GameObject dummyClone = Instantiate(playerDummy);
+                    SceneManager.MoveGameObjectToScene(dummyClone, sceneClone);
+
+                    Rigidbody2D dummyRigidbody = dummyClone.GetComponent<Rigidbody2D>();
+                    PhysicsMovement dummyMovement = dummyClone.GetComponent<PhysicsMovement>();
+
+                    dummyRigidbody.position = message.position;
+                    dummyRigidbody.velocity = message.velocity;
+
+                    int rewindTick = lastStateReadTick;
+                    while(rewindTick < tickNumber)
+                    {
+                        int rewindBufferSlot = rewindTick % bufferLength;
+
+                        dummyMovement.Movement(InputMSGtoInput(inputBuffer[rewindBufferSlot]));
+
+                        stateBuffer[rewindBufferSlot].position = dummyRigidbody.position;
+                        stateBuffer[rewindBufferSlot].velocity = dummyRigidbody.velocity;
+
+                        physicsScene2D.Simulate(Time.fixedDeltaTime);
+
+                        rewindTick++;
+                    }
+
+                    rigidBody.position = dummyRigidbody.position;
+                    rigidBody.velocity = dummyRigidbody.velocity;
+
+                    Destroy(dummyClone);
                 }
             }
             else
@@ -105,7 +132,7 @@ public class NetworkPlayer : NetworkBehaviour
                 else if(distance > 0.1f)
                     rigidBody.position += difference * 0.1f;
                 rigidBody.velocity = message.velocity;
-                playerInput.input = message.input;
+                // playerInput.input = message.input;
             }
 
             lastStateReadTick++;
@@ -135,7 +162,7 @@ public class NetworkPlayer : NetworkBehaviour
                 rotation = rigidBody.rotation,
                 velocity = rigidBody.velocity,
                 angularVelocity = rigidBody.angularVelocity,
-                tickNumber = lastInputReadTick,
+                tickNumber = lastInputReadTick+1,
             }, input);
 
             lastInputReadTick++;
@@ -181,5 +208,15 @@ public class NetworkPlayer : NetworkBehaviour
 
         SceneManager.MoveGameObjectToScene(level, sceneClone);
 
-     }
+    }
+
+    MyInput InputMSGtoInput(InputMessage message)
+    {
+        MyInput input = new MyInput();
+        input.x = message.x;
+        input.y = message.y;
+        input.jumping = message.jumping;
+
+        return input;
+    }
 }

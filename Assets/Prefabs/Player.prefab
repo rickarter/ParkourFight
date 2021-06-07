@@ -292,6 +292,7 @@ MonoBehaviour:
   playerMovement: {fileID: 8793705957564001868}
   playerInput: {fileID: 58525976669110928}
   playerAnimation: {fileID: -3449654334823481134}
+  playerDummy: {fileID: 7249994156374135897, guid: 340afa70551cd1645be887e579d12686, type: 3}
 --- !u!1 &1107844983531279689
 GameObject:
   m_ObjectHideFlags: 0
