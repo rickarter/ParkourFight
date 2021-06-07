@@ -39,12 +39,12 @@ public class NetworkPlayer : NetworkBehaviour
     void Start()
     {
         //Setup the array
-        for(int i = 0; i < bufferLength; i++)
+        /*for(int i = 0; i < bufferLength; i++)
         {
             clientStates[i].input = new MyInput();
-        }
+        }*/
 
-        if(IsServer) Physics2D.simulationMode = SimulationMode2D.Script;
+        if(IsServer || true) Physics2D.simulationMode = SimulationMode2D.Script;
 
         CreateCloneScene();
     }
@@ -62,14 +62,15 @@ public class NetworkPlayer : NetworkBehaviour
 
         MyInput input = playerInput.input;
 
-        InputMessage inputMessage = new InputMessage(input, tickNumber);
-
-        SendInputServerRpc(inputMessage);
-
         int bufferSlot = tickNumber % bufferLength;
         clientStates[bufferSlot] = new ClientState(input, rigidBody, tickNumber);
 
+        InputMessage inputMessage = new InputMessage(input, tickNumber);
+        SendInputServerRpc(inputMessage);
+
         playerMovement.Movement(input);
+
+        Physics2D.Simulate(Time.deltaTime);
 
         tickNumber++;
     }
@@ -92,6 +93,8 @@ public class NetworkPlayer : NetworkBehaviour
         SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
     }
 
+    private int b;
+
     [ClientRpc]
     void SendStateClientRpc(StateMessage message, MyInput input)
     {
@@ -102,16 +105,16 @@ public class NetworkPlayer : NetworkBehaviour
 
         if(IsLocalPlayer)
         {
-            // Debug.Log(message.tickNumber.ToString() + "--" + clientStates[bufferSlot].tickNumber.ToString());
-            if(message.tickNumber != clientStates[bufferSlot].tickNumber) 
+            /*if(message.tickNumber != clientStates[bufferSlot].tickNumber) 
             {
-                Debug.Log("Not equal");
-                Debug.Log(message.tickNumber.ToString() + "--" + clientStates[bufferSlot].tickNumber.ToString());
-                Application.Quit();
-            }
+                Debug.Log(message.tickNumber.ToString() + "--" + clientStates[bufferSlot].tickNumber.ToString() + "--" + tickNumber.ToString());
+                Debug.Log(message.position.ToString() + "--" + clientStates[bufferSlot].position.ToString());
+            }*/
             
-            if(difference.magnitude > threhold)
+            if(difference.magnitude > threhold && message.tickNumber == clientStates[bufferSlot].tickNumber)
             {
+                // Debug.Log(difference.magnitude);
+                // Debug.Break();
                 GameObject dummy = Instantiate(playerDummy);
                 SceneManager.MoveGameObjectToScene(dummy, sceneClone);
 
@@ -120,6 +123,7 @@ public class NetworkPlayer : NetworkBehaviour
 
                 dummyRigidbody.position = message.position;
                 dummyRigidbody.velocity = message.velocity;
+                
 
                 int rewindTick = message.tickNumber;
                 while (rewindTick < tickNumber)
