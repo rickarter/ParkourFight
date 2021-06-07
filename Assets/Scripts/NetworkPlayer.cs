@@ -93,7 +93,7 @@ public class NetworkPlayer : NetworkBehaviour
             float distance = difference.magnitude;
             if(IsLocalPlayer)
             {
-                if(distance > 4)
+                if(distance > 0.001f)
                 {
                     GameObject dummyClone = Instantiate(playerDummy);
                     SceneManager.MoveGameObjectToScene(dummyClone, sceneClone);

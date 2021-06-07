@@ -6,29 +6,26 @@ using MLAPI;
 
 public class ConnectionManger : MonoBehaviour
 {
-    [SerializeField]
-    private bool startHost;
+    static private string ip;
 
     void Start()
     {
-        if(startHost)
-        {
-            NetworkManager.Singleton.StartHost();
-        }
+        ip = "127.0.0.1";
     }
 
     void OnGUI()
     {
         GUILayout.BeginArea(new Rect(10, 10, 300, 300));
-        if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
-        {
-            StartButtons();
-        }
-        else
-        {
-            StatusLabels();
-            DisconnectButton();
-        }
+
+            if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
+            {
+                StartButtons();
+            }
+            else
+            {
+                StatusLabels();
+                DisconnectButton();
+            }
 
         GUILayout.EndArea();
     }
@@ -36,7 +33,18 @@ public class ConnectionManger : MonoBehaviour
     static void StartButtons()
     {
         if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
-        if (GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
+
+        GUILayout.BeginHorizontal();
+
+            ip = GUILayout.TextField(ip);
+
+            if (GUILayout.Button("Client")) 
+            {
+                NetworkManager.Singleton.StartClient();
+            }
+
+        GUILayout.EndHorizontal();
+
         if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
     }
 
