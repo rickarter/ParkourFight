@@ -1019,7 +1019,7 @@ MonoBehaviour:
     ReceiveTickrate: 512
     NetworkTickIntervalSec: 0.05
     MaxReceiveEventsPerTickRate: 2000
-    EventTickrate: 64
+    EventTickrate: 512
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 

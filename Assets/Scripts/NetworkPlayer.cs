@@ -44,6 +44,8 @@ public class NetworkPlayer : NetworkBehaviour
             clientStates[i].input = new MyInput();
         }
 
+        if(IsServer) Physics2D.simulationMode = SimulationMode2D.Script;
+
         CreateCloneScene();
     }
 
@@ -65,7 +67,7 @@ public class NetworkPlayer : NetworkBehaviour
         SendInputServerRpc(inputMessage);
 
         int bufferSlot = tickNumber % bufferLength;
-        clientStates[bufferSlot] = new ClientState(input, rigidBody);
+        clientStates[bufferSlot] = new ClientState(input, rigidBody, tickNumber);
 
         playerMovement.Movement(input);
 
@@ -80,20 +82,12 @@ public class NetworkPlayer : NetworkBehaviour
     [ServerRpc]
     void SendInputServerRpc(InputMessage message)
     {
-        // int bufferSlot = message.tickNumber % bufferLength;
-
-        // MyInput input = new MyInput(message);
-
-        // playerInput.input = input;
-        // Debug.Log(input.x);
-        // playerMovement.Movement(input);
-
-        // SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
-
         MyInput input = new MyInput(message);
 
         playerInput.input = input;
         playerMovement.Movement(input);
+
+        Physics2D.Simulate(Time.fixedDeltaTime);
 
         SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
     }
@@ -105,9 +99,17 @@ public class NetworkPlayer : NetworkBehaviour
 
         int bufferSlot = message.tickNumber % bufferLength;
         Vector2 difference = message.position - clientStates[bufferSlot].position;
-    
+
         if(IsLocalPlayer)
         {
+            // Debug.Log(message.tickNumber.ToString() + "--" + clientStates[bufferSlot].tickNumber.ToString());
+            if(message.tickNumber != clientStates[bufferSlot].tickNumber) 
+            {
+                Debug.Log("Not equal");
+                Debug.Log(message.tickNumber.ToString() + "--" + clientStates[bufferSlot].tickNumber.ToString());
+                Application.Quit();
+            }
+            
             if(difference.magnitude > threhold)
             {
                 GameObject dummy = Instantiate(playerDummy);
@@ -138,7 +140,7 @@ public class NetworkPlayer : NetworkBehaviour
                 if(positionError.magnitude > 2.0f)
                     rigidBody.position = dummyRigidbody.position;
                 else if(positionError.magnitude > 0.1f)
-                    rigidBody.position += positionError * 0.1f;
+                    rigidBody.position += positionError * Time.deltaTime * 10;
 
                 rigidBody.velocity = dummyRigidbody.velocity;
 
@@ -149,9 +151,9 @@ public class NetworkPlayer : NetworkBehaviour
         {
             if(difference.magnitude > 2.0f)
                 rigidBody.position = message.position;
-            else if(difference.magnitude > 0.1f)
-                rigidBody.position += difference * 0.1f;
-
+            else
+                rigidBody.position += difference * Time.deltaTime * 10;
+            playerInput.input = message.input;
             rigidBody.velocity = message.velocity;
         }
     }

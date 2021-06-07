@@ -9,13 +9,15 @@ public struct ClientState
     public float rotation;
     public Vector2 velocity;
     public float angularVelocity;
+    public int tickNumber;
 
-    public ClientState(MyInput input, Rigidbody2D rigidbody2D)
+    public ClientState(MyInput input, Rigidbody2D rigidbody2D, int tickNumber)
     {
         this.input = input;
         position = rigidbody2D.position;
         rotation = rigidbody2D.rotation;
         velocity = rigidbody2D.velocity;
         angularVelocity = rigidbody2D.angularVelocity;
+        this.tickNumber = tickNumber;
     }
 }
