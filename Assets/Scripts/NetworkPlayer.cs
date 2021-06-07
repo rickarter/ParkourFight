@@ -21,16 +21,9 @@ public class NetworkPlayer : NetworkBehaviour
     public float threhold = 1;
 
     const int bufferLength = 1024;
-    private InputMessage[] inputBuffer = new InputMessage[bufferLength];
-    private StateMessage[] stateBuffer = new StateMessage[bufferLength];
+    private ClientState[] clientStates = new ClientState[bufferLength];
 
-    private InputMessage[] inputMessages = new InputMessage[bufferLength];
-    private StateMessage[] stateMessages = new StateMessage[bufferLength];
     private int tickNumber = 0;
-    private int lastInputWriteTick = 0;
-    private int lastInputReadTick = 0;
-    private int lastStateWriteTick = 0;
-    private int lastStateReadTick = 0;
 
     private Scene sceneClone;
     private PhysicsScene2D physicsScene2D;
@@ -48,7 +41,7 @@ public class NetworkPlayer : NetworkBehaviour
         //Setup the array
         for(int i = 0; i < bufferLength; i++)
         {
-            stateMessages[i].input = new MyInput();
+            clientStates[i].input = new MyInput();
         }
 
         CreateCloneScene();
@@ -63,159 +56,104 @@ public class NetworkPlayer : NetworkBehaviour
 
     void ClientUpdate()
     {
+        if(!IsLocalPlayer) return;
+
         MyInput input = playerInput.input;
 
-        if(IsLocalPlayer)
-        {
-            InputMessage inputMessage = new InputMessage()
-            {
-                x = input.x,
-                y = input.y,
-                jumping = input.jumping,
-                tickNumber = tickNumber
-            };
-            SendInputServerRpc(inputMessage);
+        InputMessage inputMessage = new InputMessage(input, tickNumber);
 
-            int bufferSlot = tickNumber % bufferLength;
-            inputBuffer[bufferSlot] = inputMessage;
-            stateBuffer[bufferSlot] = new StateMessage()
-            {
-                position = rigidBody.position,
-                rotation = rigidBody.rotation,
-                velocity = rigidBody.velocity,
-                angularVelocity = rigidBody.angularVelocity,
-                tickNumber = tickNumber,
-            };
+        SendInputServerRpc(inputMessage);
 
-            playerMovement.Movement(input);
+        int bufferSlot = tickNumber % bufferLength;
+        clientStates[bufferSlot] = new ClientState(input, rigidBody);
 
-            tickNumber++;
-        }
+        playerMovement.Movement(input);
 
-        if(HasAvailiableStateMessages())
-        {
-            int bufferSlot = lastStateReadTick % bufferLength;
-            StateMessage message = stateMessages[bufferSlot];   
-
-            Vector2 difference = message.position - stateBuffer[bufferSlot].position;
-            float distance = difference.magnitude;
-
-            if(IsLocalPlayer)
-            {
-                if(distance > threhold)
-                {
-                    GameObject dummy = Instantiate(playerDummy);
-                    SceneManager.MoveGameObjectToScene(dummy, sceneClone);
-
-                    Rigidbody2D dummyRigidbody = dummy.GetComponent<Rigidbody2D>();
-                    PhysicsMovement dummyMovement = dummy.GetComponent<PhysicsMovement>();
-
-                    dummyRigidbody.position = message.position;
-                    dummyRigidbody.velocity = message.velocity;
-
-                    int rewindTick = lastStateReadTick;
-                    while(rewindTick < tickNumber)
-                    {
-                        int rewindBufferSlot = rewindTick % bufferLength;
-
-                        dummyMovement.Movement(InputMSGtoInput(inputBuffer[rewindBufferSlot]));
-
-                        stateBuffer[rewindBufferSlot].position = dummyRigidbody.position;
-                        stateBuffer[rewindBufferSlot].velocity = dummyRigidbody.velocity;
-
-                        physicsScene2D.Simulate(Time.fixedDeltaTime);
-
-                        rewindTick++;
-                    }
-
-                    // Vector2 positionError = dummyRigidbody.position - rigidBody.position;
-
-                    // if(positionError.magnitude >= 4f)
-                    // {
-                    //     rigidBody.position = dummyRigidbody.position;
-                    //     rigidBody.velocity = dummyRigidbody.velocity;
-                    // }
-                    // else
-                    // {
-                    //     rigidBody.position = Vector2.Lerp(rigidBody.position, dummyRigidbody.position, 0.1f);
-                    //     rigidBody.velocity = dummyRigidbody.velocity;
-                    // }
-
-                    rigidBody.position = dummyRigidbody.position;
-                    rigidBody.velocity = dummyRigidbody.velocity;
-
-                    Debug.Log("Bad");
-
-                    Destroy(dummy);
-                }
-            }
-            else
-            {
-                if(distance > 2.0f)
-                    rigidBody.position = message.position;
-                else if(distance > 0.1f)
-                    rigidBody.position += difference * 0.1f;
-                rigidBody.velocity = message.velocity;
-                playerInput.input = message.input;
-            }
-
-            lastStateReadTick++;
-        }
+        tickNumber++;
     }
 
     void ServerUpdate()
     {
-        MyInput input = new MyInput();
 
-        if(HasAvailiableInputMessages())
-        {
-            int bufferSlot = lastInputReadTick % bufferLength;
-            InputMessage message = inputMessages[bufferSlot];
-
-            input.x = message.x;
-            input.y = message.y;
-            input.jumping = message.jumping;
-
-            playerInput.input = input;
-
-            playerMovement.Movement(input);
-
-            SendStateClientRpc(new StateMessage()
-            {
-                position = rigidBody.position,
-                rotation = rigidBody.rotation,
-                velocity = rigidBody.velocity,
-                angularVelocity = rigidBody.angularVelocity,
-                tickNumber = lastInputReadTick+1,
-            }, input);
-
-            lastInputReadTick++;
-        }
     }
 
     [ServerRpc]
     void SendInputServerRpc(InputMessage message)
     {
-        inputMessages[message.tickNumber % bufferLength] = message;
-        lastInputWriteTick++;
+        // int bufferSlot = message.tickNumber % bufferLength;
+
+        // MyInput input = new MyInput(message);
+
+        // playerInput.input = input;
+        // Debug.Log(input.x);
+        // playerMovement.Movement(input);
+
+        // SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
+
+        MyInput input = new MyInput(message);
+
+        playerInput.input = input;
+        playerMovement.Movement(input);
+
+        SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
     }
 
     [ClientRpc]
     void SendStateClientRpc(StateMessage message, MyInput input)
     {
         message.input = input;
-        stateMessages[message.tickNumber % bufferLength] = message;
-        lastStateWriteTick++;
-    }
 
-    bool HasAvailiableInputMessages()
-    {
-        return lastInputReadTick < lastInputWriteTick;
-    }
+        int bufferSlot = message.tickNumber % bufferLength;
+        Vector2 difference = message.position - clientStates[bufferSlot].position;
+    
+        if(IsLocalPlayer)
+        {
+            if(difference.magnitude > threhold)
+            {
+                GameObject dummy = Instantiate(playerDummy);
+                SceneManager.MoveGameObjectToScene(dummy, sceneClone);
 
-    bool HasAvailiableStateMessages()
-    {
-        return lastStateReadTick < lastStateWriteTick;
+                Rigidbody2D dummyRigidbody = dummy.GetComponent<Rigidbody2D>();
+                PhysicsMovement dummyMovement = dummy.GetComponent<PhysicsMovement>();
+
+                dummyRigidbody.position = message.position;
+                dummyRigidbody.velocity = message.velocity;
+
+                int rewindTick = message.tickNumber;
+                while (rewindTick < tickNumber)
+                {
+                    int rewindBufferSlot = rewindTick % bufferLength;
+
+                    dummyMovement.Movement(clientStates[rewindBufferSlot].input);
+
+                    clientStates[rewindBufferSlot].position = dummyRigidbody.position;
+                    clientStates[rewindBufferSlot].velocity = dummyRigidbody.velocity;
+
+                    physicsScene2D.Simulate(Time.fixedDeltaTime);
+
+                    rewindTick++;
+                }
+
+                Vector2 positionError = dummyRigidbody.position - rigidBody.position;
+                if(positionError.magnitude > 2.0f)
+                    rigidBody.position = dummyRigidbody.position;
+                else if(positionError.magnitude > 0.1f)
+                    rigidBody.position += positionError * 0.1f;
+
+                rigidBody.velocity = dummyRigidbody.velocity;
+
+                Destroy(dummy);
+            }
+        }
+        else
+        {
+            if(difference.magnitude > 2.0f)
+                rigidBody.position = message.position;
+            else if(difference.magnitude > 0.1f)
+                rigidBody.position += difference * 0.1f;
+
+            rigidBody.velocity = message.velocity;
+        }
     }
 
     void CreateCloneScene()

@@ -13,6 +13,18 @@ public struct StateMessage : INetworkSerializable
     public int tickNumber;
     public MyInput input;
 
+    public StateMessage(Rigidbody2D rigidbody2D, int tickNumber)
+    {
+        position = rigidbody2D.position;
+        rotation = rigidbody2D.rotation;
+        velocity = rigidbody2D.velocity;
+        angularVelocity = rigidbody2D.angularVelocity;
+
+        this.tickNumber = tickNumber;
+
+        input = new MyInput();
+    }
+
     public void NetworkSerialize(NetworkSerializer serializer)
     {
         serializer.Serialize(ref position);

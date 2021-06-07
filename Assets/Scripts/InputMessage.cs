@@ -12,6 +12,14 @@ public struct InputMessage: INetworkSerializable
     public bool jumping;
     public int tickNumber;
 
+    public InputMessage(MyInput input, int tickNumber)
+    {
+        x = input.x;
+        y = input.y;
+        jumping = input.jumping;
+        this.tickNumber = tickNumber;
+    }
+
     // INetworkSerializable
     public void NetworkSerialize(NetworkSerializer serializer)
     {

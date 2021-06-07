@@ -1016,9 +1016,9 @@ MonoBehaviour:
     PlayerPrefabHash:
       id: 0
     CreatePlayerPrefab: 1
-    ReceiveTickrate: 256
+    ReceiveTickrate: 512
     NetworkTickIntervalSec: 0.05
-    MaxReceiveEventsPerTickRate: 1000
+    MaxReceiveEventsPerTickRate: 2000
     EventTickrate: 64
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0

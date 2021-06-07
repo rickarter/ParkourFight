@@ -8,8 +8,22 @@ using MLAPI.Serialization;
 
 public class MyInput : INetworkSerializable
 {
-    public float x = 0f, y = 0f;
-    public bool jumping = false;
+    public float x, y;
+    public bool jumping;
+
+    public MyInput()
+    {
+        x = 0;
+        y = 0;
+        jumping = false;
+    }
+
+    public MyInput(InputMessage message)
+    {
+        x = message.x;
+        y = message.y;
+        jumping = message.jumping;
+    }
 
     public void Input()
     {
