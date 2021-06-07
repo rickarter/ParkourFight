@@ -9,10 +9,12 @@ using MLAPI;
 public class ConnectionManger : MonoBehaviour
 {
     static private string ip;
+    static public MLAPI.Transports.UNET.UNetTransport transport;
 
     void Start()
     {
         ip = "127.0.0.1";
+        transport = FindObjectOfType<MLAPI.Transports.UNET.UNetTransport>();
     }
 
     void OnGUI()
@@ -42,6 +44,7 @@ public class ConnectionManger : MonoBehaviour
 
             if (GUILayout.Button("Client")) 
             {
+                transport.ConnectAddress = ip;
                 NetworkManager.Singleton.StartClient();
             }
 
