@@ -76,8 +76,6 @@ public class NetworkPlayer : NetworkBehaviour
             };
             SendInputServerRpc(inputMessage);
 
-            playerMovement.Movement(input);
-
             int bufferSlot = tickNumber % bufferLength;
             inputBuffer[bufferSlot] = inputMessage;
             stateBuffer[bufferSlot] = new StateMessage()
@@ -89,6 +87,8 @@ public class NetworkPlayer : NetworkBehaviour
                 tickNumber = tickNumber,
             };
 
+            playerMovement.Movement(input);
+
             tickNumber++;
         }
 
@@ -97,7 +97,7 @@ public class NetworkPlayer : NetworkBehaviour
             int bufferSlot = lastStateReadTick % bufferLength;
             StateMessage message = stateMessages[bufferSlot];   
 
-            Vector2 difference = message.position - rigidBody.position;
+            Vector2 difference = message.position - stateBuffer[bufferSlot].position;
             float distance = difference.magnitude;
 
             if(IsLocalPlayer)
@@ -128,21 +128,23 @@ public class NetworkPlayer : NetworkBehaviour
                         rewindTick++;
                     }
 
-                    Vector2 positionError = dummyRigidbody.position - rigidBody.position;
+                    // Vector2 positionError = dummyRigidbody.position - rigidBody.position;
 
-                    if(positionError.magnitude >= 4f)
-                    {
-                        rigidBody.position = dummyRigidbody.position;
-                        rigidBody.velocity = dummyRigidbody.velocity;
-                    }
-                    else
-                    {
-                        rigidBody.position = Vector2.Lerp(rigidBody.position, dummyRigidbody.position, 0.1f);
-                        rigidBody.velocity = dummyRigidbody.velocity;
-                    }
+                    // if(positionError.magnitude >= 4f)
+                    // {
+                    //     rigidBody.position = dummyRigidbody.position;
+                    //     rigidBody.velocity = dummyRigidbody.velocity;
+                    // }
+                    // else
+                    // {
+                    //     rigidBody.position = Vector2.Lerp(rigidBody.position, dummyRigidbody.position, 0.1f);
+                    //     rigidBody.velocity = dummyRigidbody.velocity;
+                    // }
 
-                    // rigidBody.position = dummyRigidbody.position;
-                    // rigidBody.velocity = dummyRigidbody.velocity;
+                    rigidBody.position = dummyRigidbody.position;
+                    rigidBody.velocity = dummyRigidbody.velocity;
+
+                    Debug.Log("Bad");
 
                     Destroy(dummy);
                 }
