@@ -18,6 +18,8 @@ public class NetworkPlayer : NetworkBehaviour
     public  GameObject playerDummy;
 
     //Network
+    public float threhold = 1;
+
     const int bufferLength = 1024;
     private InputMessage[] inputBuffer = new InputMessage[bufferLength];
     private StateMessage[] stateBuffer = new StateMessage[bufferLength];
@@ -32,6 +34,9 @@ public class NetworkPlayer : NetworkBehaviour
 
     private Scene sceneClone;
     private PhysicsScene2D physicsScene2D;
+    private GameObject dummy;
+    Rigidbody2D dummyRigidbody;
+    PhysicsMovement dummyMovement;
 
     void Awake()
     {
@@ -80,6 +85,9 @@ public class NetworkPlayer : NetworkBehaviour
             };
 
             playerMovement.Movement(input);
+            dummyMovement.Movement(input);
+
+            physicsScene2D.Simulate(Time.fixedDeltaTime);
 
             tickNumber++;
         }
@@ -93,13 +101,10 @@ public class NetworkPlayer : NetworkBehaviour
             float distance = difference.magnitude;
             if(IsLocalPlayer)
             {
-                if(distance > 0.001f)
+                if(distance > threhold)
                 {
-                    GameObject dummyClone = Instantiate(playerDummy);
-                    SceneManager.MoveGameObjectToScene(dummyClone, sceneClone);
-
-                    Rigidbody2D dummyRigidbody = dummyClone.GetComponent<Rigidbody2D>();
-                    PhysicsMovement dummyMovement = dummyClone.GetComponent<PhysicsMovement>();
+                    Rigidbody2D dummyRigidbody = dummy.GetComponent<Rigidbody2D>();
+                    PhysicsMovement dummyMovement = dummy.GetComponent<PhysicsMovement>();
 
                     dummyRigidbody.position = message.position;
                     dummyRigidbody.velocity = message.velocity;
@@ -119,10 +124,21 @@ public class NetworkPlayer : NetworkBehaviour
                         rewindTick++;
                     }
 
-                    rigidBody.position = dummyRigidbody.position;
-                    rigidBody.velocity = dummyRigidbody.velocity;
+                    // Vector2 positionError = dummyRigidbody.position - rigidBody.position;
 
-                    Destroy(dummyClone);
+
+                    // if(positionError.magnitude >= 5*threhold)
+                    // {
+                    //     rigidBody.position = dummyRigidbody.position;
+                    //     rigidBody.velocity = dummyRigidbody.velocity;
+                    // }
+                    // else
+                    // {
+                    //     rigidBody.position = Vector2.Lerp(rigidBody.position, dummyRigidbody.position, Time.deltaTime);
+                    //     rigidBody.velocity = dummyRigidbody.velocity;
+                    // }                
+
+                    // Destroy(dummy);
                 }
             }
             else
@@ -205,8 +221,13 @@ public class NetworkPlayer : NetworkBehaviour
         physicsScene2D = sceneClone.GetPhysicsScene2D();
 
         GameObject level = Instantiate(GameObject.FindGameObjectWithTag("Level"));
+        dummy = Instantiate(playerDummy);
+
+        dummyRigidbody = dummy.GetComponent<Rigidbody2D>();
+        dummyMovement = dummy.GetComponent<PhysicsMovement>();
 
         SceneManager.MoveGameObjectToScene(level, sceneClone);
+        SceneManager.MoveGameObjectToScene(dummy, sceneClone);
 
     }
 
