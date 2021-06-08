@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -38,15 +39,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     void Start()
     {
-        //Setup the array
-        /*for(int i = 0; i < bufferLength; i++)
-        {
-            clientStates[i].input = new MyInput();
-        }*/
-
-        if(IsServer || true) Physics2D.simulationMode = SimulationMode2D.Script;
-
-        CreateCloneScene();
+        if(IsClient) ClientCloneScene();
     }
 
     // Update is called once per frame
@@ -92,8 +85,6 @@ public class NetworkPlayer : NetworkBehaviour
 
         SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
     }
-
-    private int b;
 
     [ClientRpc]
     void SendStateClientRpc(StateMessage message, MyInput input)
@@ -162,7 +153,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
-    void CreateCloneScene()
+    void ClientCloneScene()
     {
         if(!IsLocalPlayer) return;
 
@@ -175,7 +166,6 @@ public class NetworkPlayer : NetworkBehaviour
         GameObject level = Instantiate(GameObject.FindGameObjectWithTag("Level"));
 
         SceneManager.MoveGameObjectToScene(level, sceneClone);
-
     }
 
     MyInput InputMSGtoInput(InputMessage message)
