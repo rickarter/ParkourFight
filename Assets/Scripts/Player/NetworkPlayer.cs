@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.Connection;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(PlayerMovement), typeof(PlayerAnimation))]
 [RequireComponent(typeof(PlayerInput))]
@@ -75,10 +76,28 @@ public class NetworkPlayer : NetworkBehaviour
     [ServerRpc]
     void SendInputServerRpc(InputMessage message, ulong clientId)
     {
-        physicsManager.AddInputMessage(clientId, message);
-    }
+        MyInput input = new MyInput(message);
 
-    private int b;
+        playerMovement.Movement(input);
+        playerInput.input = input;
+
+        foreach(NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            if(client.ClientId != clientId)
+                client.PlayerObject.gameObject.SetActive(false);
+            else Debug.LogAssertion("The one");
+        }
+
+        Physics2D.Simulate(Time.fixedDeltaTime);
+
+        foreach(NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            if(client.ClientId != clientId)
+                client.PlayerObject.gameObject.SetActive(true);
+        }
+
+        SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
+    }
 
     [ClientRpc]
     public void SendStateClientRpc(StateMessage message, MyInput input)
