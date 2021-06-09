@@ -19,15 +19,15 @@ public class NetworkPlayer : NetworkBehaviour
     public  GameObject playerDummy;
 
     //Network
-    public float threhold = 1;
-
+        //Client
     const int bufferLength = 1024;
     private ClientState[] clientStates = new ClientState[bufferLength];
-
     private int tickNumber = 0;
-
+    public float threhold = 1;
     private Scene sceneClone;
     private PhysicsScene2D physicsScene2D;
+        //Server
+    private NetworkPhysicsManager physicsManager;
 
     void Awake()
     {
@@ -40,6 +40,7 @@ public class NetworkPlayer : NetworkBehaviour
     void Start()
     {
         if(IsClient) ClientCloneScene();
+        else physicsManager = GameObject.FindObjectOfType<NetworkPhysicsManager>();
     }
 
     // Update is called once per frame
@@ -52,14 +53,13 @@ public class NetworkPlayer : NetworkBehaviour
     void ClientUpdate()
     {
         if(!IsLocalPlayer) return;
-
         MyInput input = playerInput.input;
 
         int bufferSlot = tickNumber % bufferLength;
         clientStates[bufferSlot] = new ClientState(input, rigidBody, tickNumber);
 
         InputMessage inputMessage = new InputMessage(input, tickNumber);
-        SendInputServerRpc(inputMessage);
+        SendInputServerRpc(inputMessage, NetworkManager.Singleton.LocalClientId);
 
         playerMovement.Movement(input);
 
@@ -74,20 +74,21 @@ public class NetworkPlayer : NetworkBehaviour
     }
 
     [ServerRpc]
-    void SendInputServerRpc(InputMessage message)
+    void SendInputServerRpc(InputMessage message, ulong clientId)
     {
-        MyInput input = new MyInput(message);
+        /*MyInput input = new MyInput(message);
 
         playerInput.input = input;
         playerMovement.Movement(input);
 
         Physics2D.Simulate(Time.fixedDeltaTime);
 
-        SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
+        SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);*/
+        physicsManager.AddInputMessage(clientId, message);
     }
 
     [ClientRpc]
-    void SendStateClientRpc(StateMessage message, MyInput input)
+    public void SendStateClientRpc(StateMessage message, MyInput input)
     {
         message.input = input;
 
@@ -95,17 +96,9 @@ public class NetworkPlayer : NetworkBehaviour
         Vector2 difference = message.position - clientStates[bufferSlot].position;
 
         if(IsLocalPlayer)
-        {
-            /*if(message.tickNumber != clientStates[bufferSlot].tickNumber) 
-            {
-                Debug.Log(message.tickNumber.ToString() + "--" + clientStates[bufferSlot].tickNumber.ToString() + "--" + tickNumber.ToString());
-                Debug.Log(message.position.ToString() + "--" + clientStates[bufferSlot].position.ToString());
-            }*/
-            
+        {            
             if(difference.magnitude > threhold && message.tickNumber == clientStates[bufferSlot].tickNumber)
             {
-                // Debug.Log(difference.magnitude);
-                // Debug.Break();
                 GameObject dummy = Instantiate(playerDummy);
                 SceneManager.MoveGameObjectToScene(dummy, sceneClone);
 
@@ -176,5 +169,12 @@ public class NetworkPlayer : NetworkBehaviour
         input.jumping = message.jumping;
 
         return input;
+    }
+
+    [ClientRpc]
+    public void ResetTickClientRpc()
+    {
+        tickNumber = 0;
+        Debug.Log("Reseted: " + tickNumber.ToString());
     }
 }

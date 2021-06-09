@@ -163,7 +163,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7249994156374135897}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c7848bb1791c8f4c987f843ba98c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 6803866d8b9d2b146b322eec720ff425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 3580520104734787801}
@@ -172,7 +172,7 @@ MonoBehaviour:
   grounded: 0
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   counterMovement: 0.0035
   slideCounterMovement: 2
   jumpForce: 550
