@@ -11,8 +11,9 @@ public class NetworkPhysicsManager : NetworkBehaviour
     private int tickNumber = 0;
 
     const int bufferLength = 1024;
-    private InputMessage[,] clientMessages = new InputMessage[4, bufferLength];
-    private int[] clientTicks = new int[4];
+    const int maxClients = 4;
+    private InputMessage[,] clientMessages = new InputMessage[maxClients, bufferLength];
+    private int[] clientTicks = new int[maxClients];
 
     public override void NetworkStart()
     {
@@ -54,7 +55,7 @@ public class NetworkPhysicsManager : NetworkBehaviour
     void ResetTicks(ulong clientId)
     {
         tickNumber = 0;
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < maxClients; i++)
             clientTicks[i] = 0;
 
         foreach(NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)

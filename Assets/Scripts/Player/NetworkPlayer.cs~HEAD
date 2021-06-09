@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -39,8 +38,20 @@ public class NetworkPlayer : NetworkBehaviour
 
     void Start()
     {
+<<<<<<< HEAD:Assets/Scripts/Player/NetworkPlayer.cs
         if(IsClient) ClientCloneScene();
         else physicsManager = GameObject.FindObjectOfType<NetworkPhysicsManager>();
+=======
+        //Setup the array
+        /*for(int i = 0; i < bufferLength; i++)
+        {
+            clientStates[i].input = new MyInput();
+        }*/
+
+        if(IsServer || true) Physics2D.simulationMode = SimulationMode2D.Script;
+
+        CreateCloneScene();
+>>>>>>> parent of 2a5536b (CreateCloneScene->ClientCloneScene):Assets/Scripts/NetworkPlayer.cs
     }
 
     // Update is called once per frame
@@ -76,8 +87,18 @@ public class NetworkPlayer : NetworkBehaviour
     [ServerRpc]
     void SendInputServerRpc(InputMessage message, ulong clientId)
     {
+        /*MyInput input = new MyInput(message);
+
+        playerInput.input = input;
+        playerMovement.Movement(input);
+
+        Physics2D.Simulate(Time.fixedDeltaTime);
+
+        SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);*/
         physicsManager.AddInputMessage(clientId, message);
     }
+
+    private int b;
 
     [ClientRpc]
     public void SendStateClientRpc(StateMessage message, MyInput input)
@@ -138,7 +159,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
-    void ClientCloneScene()
+    void CreateCloneScene()
     {
         if(!IsLocalPlayer) return;
 
@@ -151,6 +172,7 @@ public class NetworkPlayer : NetworkBehaviour
         GameObject level = Instantiate(GameObject.FindGameObjectWithTag("Level"));
 
         SceneManager.MoveGameObjectToScene(level, sceneClone);
+
     }
 
     MyInput InputMSGtoInput(InputMessage message)
@@ -167,5 +189,6 @@ public class NetworkPlayer : NetworkBehaviour
     public void ResetTickClientRpc()
     {
         tickNumber = 0;
+        Debug.Log("Reseted: " + tickNumber.ToString());
     }
 }
