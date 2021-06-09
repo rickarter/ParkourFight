@@ -1,14 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
+using UnityEngine.SceneManagement;
 
 using MLAPI;
 using MLAPI.Connection;
 
 public class NetworkPhysicsManager : NetworkBehaviour
 {
-    private int tickNumber = 0;
+    public Scene scene;
+    public PhysicsScene2D physicsScene2D;
+
+    public override void NetworkStart()
+    {
+        if(!IsServer) return;
+
+        scene = SceneManager.CreateScene(
+            "ServerScene", 
+            new CreateSceneParameters(LocalPhysicsMode.Physics2D));
+        physicsScene2D = scene.GetPhysicsScene2D();
+
+        GameObject level = Instantiate(GameObject.FindGameObjectWithTag("Level"));
+        SceneManager.MoveGameObjectToScene(level, scene);
+    }
+
+/*    private int tickNumber = 0;
 
     const int bufferLength = 1024;
     const int maxClients = 4;
@@ -98,5 +114,5 @@ public class NetworkPhysicsManager : NetworkBehaviour
         clientMessages[clientSlot, bufferSlot] = message;
 
         clientTicks[clientSlot] = message.tickNumber;
-    }
+    }*/
 }

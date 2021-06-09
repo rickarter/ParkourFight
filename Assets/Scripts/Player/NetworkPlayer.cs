@@ -8,7 +8,7 @@ using MLAPI.Messaging;
 using MLAPI.Connection;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(PlayerMovement), typeof(PlayerAnimation))]
-[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(PlayerInput), typeof(PlayerStunts))]
 public class NetworkPlayer : NetworkBehaviour
 {
     //Components
@@ -16,6 +16,7 @@ public class NetworkPlayer : NetworkBehaviour
     public PlayerMovement playerMovement;
     public PlayerInput playerInput;
     public PlayerAnimation playerAnimation;
+    public PlayerStunts playerStunts;
     public  GameObject playerDummy;
 
     //Network
@@ -29,12 +30,18 @@ public class NetworkPlayer : NetworkBehaviour
         //Server
     private NetworkPhysicsManager physicsManager;
 
+    public override void NetworkStart()
+    {
+        base.NetworkStart();
+    }
+
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
         playerMovement = GetComponent<PlayerMovement>();
         playerInput = GetComponent<PlayerInput>();
         playerAnimation = GetComponent<PlayerAnimation>();
+        playerStunts = GetComponent<PlayerStunts>();
     }
 
     void Start()
@@ -81,20 +88,7 @@ public class NetworkPlayer : NetworkBehaviour
         playerMovement.Movement(input);
         playerInput.input = input;
 
-        foreach(NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
-        {
-            if(client.ClientId != clientId)
-                client.PlayerObject.gameObject.SetActive(false);
-            else Debug.LogAssertion("The one");
-        }
-
         Physics2D.Simulate(Time.fixedDeltaTime);
-
-        foreach(NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
-        {
-            if(client.ClientId != clientId)
-                client.PlayerObject.gameObject.SetActive(true);
-        }
 
         SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
     }
@@ -163,7 +157,7 @@ public class NetworkPlayer : NetworkBehaviour
         if(!IsLocalPlayer) return;
 
         sceneClone = SceneManager.CreateScene(
-            "CloneScene",
+            "ClientScene",
             new CreateSceneParameters(LocalPhysicsMode.Physics2D)
         );
         physicsScene2D = sceneClone.GetPhysicsScene2D();
