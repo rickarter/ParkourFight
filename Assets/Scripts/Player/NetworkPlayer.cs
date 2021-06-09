@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -39,7 +38,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     void Start()
     {
-        if(IsClient) ClientCloneScene();
+        if(IsClient) CreateCloneScene();
         else physicsManager = GameObject.FindObjectOfType<NetworkPhysicsManager>();
     }
 
@@ -78,6 +77,8 @@ public class NetworkPlayer : NetworkBehaviour
     {
         physicsManager.AddInputMessage(clientId, message);
     }
+
+    private int b;
 
     [ClientRpc]
     public void SendStateClientRpc(StateMessage message, MyInput input)
@@ -138,7 +139,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
-    void ClientCloneScene()
+    void CreateCloneScene()
     {
         if(!IsLocalPlayer) return;
 
@@ -151,6 +152,7 @@ public class NetworkPlayer : NetworkBehaviour
         GameObject level = Instantiate(GameObject.FindGameObjectWithTag("Level"));
 
         SceneManager.MoveGameObjectToScene(level, sceneClone);
+
     }
 
     MyInput InputMSGtoInput(InputMessage message)
