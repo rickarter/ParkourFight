@@ -13,29 +13,29 @@ public class PlayerAnimation : NetworkBehaviour
     private Rigidbody2D rb;
 
     //Asignables
-    //Inverse kinematics
-    public Transform overridenFrontArmEffector;
+        //Inverse kinematics
     public Transform frontArmEffector;
-
-    public Transform overridenBackArmEffector;
     public Transform backArmEffector;
-
-    public Transform overidenFrontLegEffector;
     public Transform frontLegEffector;
+    public Transform backLegEffector;
 
-    public Transform overridenBackLegEffector;
-    public Transform BackLegEffector;
-
-    //Animations
+        //Animations
     private string currentState = string.Empty;
     const string IDLE = "Idle";
     const string RUN = "Run";
     const string JUMP = "Jump";
     const string FLOATING = "Floating";
 
-    //Grabing
+        //Grabing
     private bool grab = false;
+    private bool tuck = false;
     private Vector3 grabPoint;
+
+        //Jump tucking
+    public Transform startArms;
+    public Transform endArms;
+    public Transform startLegs;
+    public Transform endLegs;
 
     void Start()
     {
@@ -74,28 +74,48 @@ public class PlayerAnimation : NetworkBehaviour
             frontArmEffector.position = grabPoint;
             backArmEffector.position = grabPoint;
         }
+        if(tuck)
+        {
+            float t = player.playerInput.input.tuck;
+            
+            frontArmEffector.position = Vector3.Slerp(startArms.position, endArms.position, t);
+            backArmEffector.position = Vector3.Slerp(startArms.position, endArms.position, t);
+
+            frontLegEffector.position = Vector3.Slerp(startLegs.position, endLegs.position, t);
+            backLegEffector.position = Vector3.Slerp(startLegs.position, endLegs.position, t);
+        }
     }
 
     public void GrabAnimation(Vector3 point)
     {
         grab = true;
         grabPoint = point;
-        overridenFrontArmEffector.parent.gameObject.SetActive(false);
-        overridenBackArmEffector.parent.gameObject.SetActive(false);
 
-        frontArmEffector.parent.gameObject.SetActive(true);
-        backArmEffector.parent.gameObject.SetActive(true);
+        animator.enabled = false;
+
         Invoke(nameof(StopGrabAnimation), 0.2f);
     }
 
     void StopGrabAnimation()
     {
         grab = false;
-            overridenFrontArmEffector.parent.gameObject.SetActive(true);
-        overridenBackArmEffector.parent.gameObject.SetActive(true);
+        animator.enabled = true;
+    }
 
-        frontArmEffector.parent.gameObject.SetActive(false);
-        backArmEffector.parent.gameObject.SetActive(false);
+    public void TuckAnimation()
+    {
+        if(tuck) return;
+
+        tuck = true;
+        animator.enabled = false;
+    }
+
+    public void StopTuckAnimation()
+    {
+        if(!tuck) return;
+
+        tuck =  false;
+        animator.enabled = true;
     }
 
     void SetAnimationState(string newState)

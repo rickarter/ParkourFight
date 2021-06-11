@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 3580520104734787801}
   - component: {fileID: 3010524077073186692}
   - component: {fileID: 6174384651253298570}
+  - component: {fileID: -1940147359234876003}
   m_Layer: 0
   m_Name: PlayerDummy
   m_TagString: Untagged
@@ -181,3 +182,17 @@ MonoBehaviour:
   shoulderOffset: {x: 0, y: 1.325, z: 0}
   grabRadius: 1
   jumping: 0
+--- !u!114 &-1940147359234876003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7249994156374135897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 743d4e6fb7a783d489e2cf3fadbe2afc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backflipTorque: 15
+  rigidBody: {fileID: 3580520104734787801}

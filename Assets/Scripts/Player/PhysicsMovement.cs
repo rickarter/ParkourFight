@@ -87,6 +87,9 @@ public class PhysicsMovement : MonoBehaviour
         Vector2 mag = rb.velocity;
         CounterMovement(x, y, mag);
 
+        if(!grounded) rb.constraints = RigidbodyConstraints2D.None;
+        else rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
         if (grounded && jumping) Jump();
         else if(!grounded && jumping) Grab(input);
 

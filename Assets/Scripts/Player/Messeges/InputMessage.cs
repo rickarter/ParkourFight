@@ -9,14 +9,18 @@ using MLAPI.Serialization;
 public struct InputMessage: INetworkSerializable
 {
     public float x, y;
-    public bool jumping;
+    public float tuck;
+    public bool jumping, backflip, frontflip;
     public int tickNumber;
 
     public InputMessage(MyInput input, int tickNumber)
     {
         x = input.x;
         y = input.y;
+        tuck = input.tuck;
         jumping = input.jumping;
+        backflip = input.backflip;
+        frontflip = input.frontflip;
         this.tickNumber = tickNumber;
     }
 
@@ -25,7 +29,10 @@ public struct InputMessage: INetworkSerializable
     {
         serializer.Serialize(ref x);
         serializer.Serialize(ref y);
+        serializer.Serialize(ref tuck);
         serializer.Serialize(ref jumping);
+        serializer.Serialize(ref backflip);
+        serializer.Serialize(ref frontflip);
         serializer.Serialize(ref tickNumber);
     }
 }

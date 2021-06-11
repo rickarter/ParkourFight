@@ -66,9 +66,10 @@ public class NetworkPlayer : NetworkBehaviour
         clientStates[bufferSlot] = new ClientState(input, rigidBody, tickNumber);
 
         InputMessage inputMessage = new InputMessage(input, tickNumber);
-        SendInputServerRpc(inputMessage, NetworkManager.Singleton.LocalClientId);
+        // SendInputServerRpc(inputMessage, NetworkManager.Singleton.LocalClientId);
 
         playerMovement.Movement(input);
+        playerStunts.Stunts(input);
 
         Physics2D.Simulate(Time.deltaTime);
 
@@ -86,7 +87,9 @@ public class NetworkPlayer : NetworkBehaviour
         MyInput input = new MyInput(message);
 
         playerMovement.Movement(input);
+        playerStunts.Stunts(input);
         playerInput.input = input;
+        Debug.Log(message.backflip);
 
         Physics2D.Simulate(Time.fixedDeltaTime);
 
@@ -110,9 +113,12 @@ public class NetworkPlayer : NetworkBehaviour
 
                 Rigidbody2D dummyRigidbody = dummy.GetComponent<Rigidbody2D>();
                 PhysicsMovement dummyMovement = dummy.GetComponent<PhysicsMovement>();
+                PhysicsStunts dummyStunts = dummy.GetComponent<PhysicsStunts>();
 
                 dummyRigidbody.position = message.position;
                 dummyRigidbody.velocity = message.velocity;
+                dummyRigidbody.rotation = message.rotation;
+                dummyRigidbody.angularVelocity = message.angularVelocity;
                 
 
                 int rewindTick = message.tickNumber;
@@ -121,6 +127,7 @@ public class NetworkPlayer : NetworkBehaviour
                     int rewindBufferSlot = rewindTick % bufferLength;
 
                     dummyMovement.Movement(clientStates[rewindBufferSlot].input);
+                    dummyStunts.Stunts(clientStates[rewindBufferSlot].input);
 
                     clientStates[rewindBufferSlot].position = dummyRigidbody.position;
                     clientStates[rewindBufferSlot].velocity = dummyRigidbody.velocity;
@@ -137,6 +144,8 @@ public class NetworkPlayer : NetworkBehaviour
                     rigidBody.position += positionError * Time.deltaTime * 10;
 
                 rigidBody.velocity = dummyRigidbody.velocity;
+                rigidBody.rotation = dummyRigidbody.rotation;
+                rigidBody.angularVelocity = dummyRigidbody.angularVelocity;
 
                 Destroy(dummy);
             }

@@ -14,14 +14,6 @@ public class NetworkPhysicsManager : NetworkBehaviour
     public override void NetworkStart()
     {
         if(!IsServer) return;
-
-        scene = SceneManager.CreateScene(
-            "ServerScene", 
-            new CreateSceneParameters(LocalPhysicsMode.Physics2D));
-        physicsScene2D = scene.GetPhysicsScene2D();
-
-        GameObject level = Instantiate(GameObject.FindGameObjectWithTag("Level"));
-        SceneManager.MoveGameObjectToScene(level, scene);
     }
 
 /*    private int tickNumber = 0;

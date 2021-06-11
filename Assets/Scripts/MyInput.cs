@@ -9,12 +9,16 @@ using MLAPI.Serialization;
 public class MyInput : INetworkSerializable
 {
     public float x, y;
-    public bool jumping;
+    public float tuck;
+    public bool jumping, backflip, frontflip;
 
     public MyInput()
     {
         x = 0;
         y = 0;
+        tuck = 0;
+        backflip = false;
+        frontflip = false;
         jumping = false;
     }
 
@@ -22,14 +26,20 @@ public class MyInput : INetworkSerializable
     {
         x = message.x;
         y = message.y;
+        tuck = message.tuck;
+        backflip = message.backflip;
         jumping = message.jumping;
+        frontflip = message.frontflip;
     }
 
     public void Input()
     {
         x = UnityEngine.Input.GetAxisRaw("Horizontal");
         y = UnityEngine.Input.GetAxisRaw("Vertical");
+        tuck = UnityEngine.Input.GetAxis("Tuck");
         jumping = UnityEngine.Input.GetButton("Jump");
+        backflip = UnityEngine.Input.GetButton("Backflip");
+        frontflip = UnityEngine.Input.GetButton("Frontflip");
     }
 
     [ClientRpc]
@@ -43,5 +53,8 @@ public class MyInput : INetworkSerializable
         serializer.Serialize(ref x);
         serializer.Serialize(ref y);
         serializer.Serialize(ref jumping);
+        serializer.Serialize(ref tuck);
+        serializer.Serialize(ref backflip);
+        serializer.Serialize(ref frontflip);
     }
 }

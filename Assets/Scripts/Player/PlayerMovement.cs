@@ -94,6 +94,9 @@ public class PlayerMovement : NetworkBehaviour
         Vector2 mag = player.rigidBody.velocity;
         CounterMovement(x, y, mag);
 
+        if(!grounded) player.rigidBody.constraints = RigidbodyConstraints2D.None;
+        else player.rigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+
         if (grounded && jumping) Jump();
         else if(!grounded && jumping) Grab(input);
 
