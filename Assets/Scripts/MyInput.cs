@@ -9,8 +9,9 @@ using MLAPI.Serialization;
 public class MyInput : INetworkSerializable
 {
     public float x, y;
-    public float tuck;
+    public float tuck, fire;
     public bool jumping, backflip, frontflip;
+    public Vector2 aim;
 
     public MyInput()
     {
@@ -20,6 +21,7 @@ public class MyInput : INetworkSerializable
         backflip = false;
         frontflip = false;
         jumping = false;
+        aim = Vector2.zero;
     }
 
     public MyInput(InputMessage message)
@@ -40,6 +42,9 @@ public class MyInput : INetworkSerializable
         jumping = UnityEngine.Input.GetButton("Jump");
         backflip = UnityEngine.Input.GetButton("Backflip");
         frontflip = UnityEngine.Input.GetButton("Frontflip");
+        fire = UnityEngine.Input.GetAxisRaw("Fire");
+        aim = new Vector3(UnityEngine.Input.GetAxis("AimX"), UnityEngine.Input.GetAxis("AimY"));
+        aim.Normalize();
     }
 
     [ClientRpc]

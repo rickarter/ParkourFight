@@ -2,16 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using MLAPI;
-using MLAPI.Messaging;
-using MLAPI.NetworkVariable;
-using MLAPI.NetworkVariable.Collections;
-
 [RequireComponent(typeof(Rigidbody2D), typeof(PlayerAnimation))]
-public class PlayerMovement : NetworkBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     //Components
-    private NetworkPlayer player;
+    private PlayerScript player;
 
     //Movement
     public float moveSpeed = 4500;
@@ -43,7 +38,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void Start()
     {
-        player = GetComponent<NetworkPlayer>();
+        player = GetComponent<PlayerScript>();
     }  
 
     void Update()
@@ -95,7 +90,11 @@ public class PlayerMovement : NetworkBehaviour
         CounterMovement(x, y, mag);
 
         if(!grounded) player.rigidBody.constraints = RigidbodyConstraints2D.None;
-        else player.rigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+        else 
+        {
+            player.rigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+            player.rigidBody.rotation = Mathf.LerpAngle(player.rigidBody.rotation, 0, Time.fixedDeltaTime*5);
+        }
 
         if (grounded && jumping) Jump();
         else if(!grounded && jumping) Grab(input);
@@ -197,6 +196,8 @@ public class PlayerMovement : NetworkBehaviour
     {
         if(!readyToGrab) return;
         
+        Vector3 shoulderOffset = this.shoulderOffset;
+        shoulderOffset = transform.up * shoulderOffset.y + transform.right * shoulderOffset.x;
         Vector3 shoulderPos = transform.position + shoulderOffset;
         //Load points into a list
         Collider2D[] colliders = Physics2D.OverlapCircleAll(shoulderPos, grabRadius, whatIsGround);

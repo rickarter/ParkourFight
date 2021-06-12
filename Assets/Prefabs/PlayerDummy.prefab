@@ -196,3 +196,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backflipTorque: 15
   rigidBody: {fileID: 3580520104734787801}
+  physicsMovement: {fileID: 6174384651253298570}
+  landRotationTime: 1

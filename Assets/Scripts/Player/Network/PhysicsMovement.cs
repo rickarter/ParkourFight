@@ -88,7 +88,11 @@ public class PhysicsMovement : MonoBehaviour
         CounterMovement(x, y, mag);
 
         if(!grounded) rb.constraints = RigidbodyConstraints2D.None;
-        else rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        else 
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            rb.rotation = Mathf.LerpAngle(rb.rotation, 0, Time.fixedDeltaTime*5);
+        }
 
         if (grounded && jumping) Jump();
         else if(!grounded && jumping) Grab(input);
@@ -149,7 +153,8 @@ public class PhysicsMovement : MonoBehaviour
 
     bool IsFloor(Vector3 normal)
     {
-        float angle = Vector3.Angle(Vector3.up, normal);
+        // float angle = Vector3.Angle(Vector3.up, normal);
+        float angle = Vector3.Angle(transform.up, normal);
         return angle < maxSlopeAngle;
     }
 

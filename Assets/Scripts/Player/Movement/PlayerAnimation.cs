@@ -2,12 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using MLAPI;
-
-public class PlayerAnimation : NetworkBehaviour
+public class PlayerAnimation : MonoBehaviour
 {
     //Components
-    private NetworkPlayer player;
+    private PlayerScript player;
 
     public Animator animator;
     private Rigidbody2D rb;
@@ -18,6 +16,7 @@ public class PlayerAnimation : NetworkBehaviour
     public Transform backArmEffector;
     public Transform frontLegEffector;
     public Transform backLegEffector;
+    public Transform frontArmEffectorO;
 
         //Animations
     private string currentState = string.Empty;
@@ -29,7 +28,10 @@ public class PlayerAnimation : NetworkBehaviour
         //Grabing
     private bool grab = false;
     private bool tuck = false;
+    private bool wield = false;
+    private bool throwing = false;
     private Vector3 grabPoint;
+    private Vector3 wieldPoint;
 
         //Jump tucking
     public Transform startArms;
@@ -37,9 +39,13 @@ public class PlayerAnimation : NetworkBehaviour
     public Transform startLegs;
     public Transform endLegs;
 
+        //Throwing
+    private float throwStartTime;
+    public float throwAnimationTime = 0.3f;
+
     void Start()
     {
-        player = GetComponent<NetworkPlayer>();
+        player = GetComponent<PlayerScript>();
     }
 
     // Update is called once per frame
@@ -47,11 +53,6 @@ public class PlayerAnimation : NetworkBehaviour
     {
         Animate();
         OverrideAnimation();
-    }
-
-    void LateUpdate()
-    {
-
     }
 
     void Animate()
@@ -83,6 +84,17 @@ public class PlayerAnimation : NetworkBehaviour
 
             frontLegEffector.position = Vector3.Slerp(startLegs.position, endLegs.position, t);
             backLegEffector.position = Vector3.Slerp(startLegs.position, endLegs.position, t);
+        }
+        if(wield && player.weapon != null)
+        {
+            frontArmEffectorO.position = player.weapon.transform.position;
+        }
+        if(throwing)
+        {
+            float t = (Time.time - throwStartTime) / throwAnimationTime;
+            if(t >= 0.8f) StopThrowAnimation();
+
+            frontArmEffectorO.position = Vector3.Slerp(startArms.position, endArms.position, t);
         }
     }
 
@@ -118,6 +130,32 @@ public class PlayerAnimation : NetworkBehaviour
         animator.enabled = true;
     }
 
+    public void WieldAnimation()
+    {
+        wield = true;    
+        frontArmEffectorO.transform.parent.gameObject.SetActive(true);
+    }
+
+    public void StopWieldAnimation()
+    {
+        wield = false;
+
+        frontArmEffectorO.transform.parent.gameObject.SetActive(false);
+    }
+
+    public void ThrowAnimation()
+    {
+        throwing = true;
+        frontArmEffectorO.transform.parent.gameObject.SetActive(true);
+
+        throwStartTime = Time.time;
+    }
+    public void StopThrowAnimation()
+    {
+        throwing = false;
+        frontArmEffectorO.transform.parent.gameObject.SetActive(false);
+    }
+
     void SetAnimationState(string newState)
     {
         if(newState == currentState) return;
@@ -134,5 +172,4 @@ public class PlayerAnimation : NetworkBehaviour
         if(player.rigidBody.velocity.x >= 0) transform.localScale = new Vector3(1, scale.y, scale.z);
         else transform.localScale = new Vector3(-1, scale.y, scale.z);
     }
-
 }

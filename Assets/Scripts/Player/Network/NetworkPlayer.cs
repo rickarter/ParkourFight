@@ -66,7 +66,7 @@ public class NetworkPlayer : NetworkBehaviour
         clientStates[bufferSlot] = new ClientState(input, rigidBody, tickNumber);
 
         InputMessage inputMessage = new InputMessage(input, tickNumber);
-        // SendInputServerRpc(inputMessage, NetworkManager.Singleton.LocalClientId);
+        SendInputServerRpc(inputMessage, NetworkManager.Singleton.LocalClientId);
 
         playerMovement.Movement(input);
         playerStunts.Stunts(input);
@@ -89,11 +89,10 @@ public class NetworkPlayer : NetworkBehaviour
         playerMovement.Movement(input);
         playerStunts.Stunts(input);
         playerInput.input = input;
-        Debug.Log(message.backflip);
 
         Physics2D.Simulate(Time.fixedDeltaTime);
 
-        SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
+        // SendStateClientRpc(new StateMessage(rigidBody, message.tickNumber+1), input);
     }
 
     [ClientRpc]
@@ -103,10 +102,11 @@ public class NetworkPlayer : NetworkBehaviour
 
         int bufferSlot = message.tickNumber % bufferLength;
         Vector2 difference = message.position - clientStates[bufferSlot].position;
+        float rotationDiffrenece = message.rotation - clientStates[bufferSlot].rotation;
 
         if(IsLocalPlayer)
         {            
-            if(difference.magnitude > threhold && message.tickNumber == clientStates[bufferSlot].tickNumber)
+            if((difference.magnitude > threhold || rotationDiffrenece > threhold)  && message.tickNumber == clientStates[bufferSlot].tickNumber)
             {
                 GameObject dummy = Instantiate(playerDummy);
                 SceneManager.MoveGameObjectToScene(dummy, sceneClone);
@@ -144,7 +144,7 @@ public class NetworkPlayer : NetworkBehaviour
                     rigidBody.position += positionError * Time.deltaTime * 10;
 
                 rigidBody.velocity = dummyRigidbody.velocity;
-                rigidBody.rotation = dummyRigidbody.rotation;
+                rigidBody.rotation = Mathf.Lerp(rigidBody.rotation, dummyRigidbody.rotation, Time.deltaTime * 10);
                 rigidBody.angularVelocity = dummyRigidbody.angularVelocity;
 
                 Destroy(dummy);

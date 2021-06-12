@@ -195,7 +195,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0
+  m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 1
@@ -295,7 +295,7 @@ MonoBehaviour:
   playerAnimation: {fileID: 0}
   playerStunts: {fileID: 0}
   playerDummy: {fileID: 7249994156374135897, guid: 340afa70551cd1645be887e579d12686, type: 3}
-  threhold: 1
+  threhold: 0.001
 --- !u!114 &8083932254385477817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,7 +309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backflipTorque: 15
-  landRotationTime: 0.2
+  landRotationTime: 1
 --- !u!1 &1107844983531279689
 GameObject:
   m_ObjectHideFlags: 0
