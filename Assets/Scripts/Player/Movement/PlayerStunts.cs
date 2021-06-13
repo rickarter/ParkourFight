@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using MLAPI;
-
-public class PlayerStunts : NetworkBehaviour
+public class PlayerStunts : MonoBehaviour
 {
     //Components
     private PlayerScript player;

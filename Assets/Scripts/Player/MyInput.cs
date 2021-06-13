@@ -2,11 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using MLAPI;
-using MLAPI.Messaging;
-using MLAPI.Serialization;
-
-public class MyInput : INetworkSerializable
+public class MyInput
 {
     public float x, y;
     public float tuck, fire;
@@ -24,16 +20,6 @@ public class MyInput : INetworkSerializable
         aim = Vector2.zero;
     }
 
-    public MyInput(InputMessage message)
-    {
-        x = message.x;
-        y = message.y;
-        tuck = message.tuck;
-        backflip = message.backflip;
-        jumping = message.jumping;
-        frontflip = message.frontflip;
-    }
-
     public void Input()
     {
         x = UnityEngine.Input.GetAxisRaw("Horizontal");
@@ -45,21 +31,5 @@ public class MyInput : INetworkSerializable
         fire = UnityEngine.Input.GetAxisRaw("Fire");
         aim = new Vector3(UnityEngine.Input.GetAxis("AimX"), UnityEngine.Input.GetAxis("AimY"));
         aim.Normalize();
-    }
-
-    [ClientRpc]
-    public void InputClientRpc()
-    {
-        Input();
-    }
-    
-    public void NetworkSerialize(NetworkSerializer serializer)
-    {
-        serializer.Serialize(ref x);
-        serializer.Serialize(ref y);
-        serializer.Serialize(ref jumping);
-        serializer.Serialize(ref tuck);
-        serializer.Serialize(ref backflip);
-        serializer.Serialize(ref frontflip);
     }
 }

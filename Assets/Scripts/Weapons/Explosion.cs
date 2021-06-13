@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TNTExplosion : MonoBehaviour
+public class Explosion : MonoBehaviour
 {
     public float explosionForce = 1000f;
     public float explostionRadius = 5f;
 
     public int damage = 30;
+
+    public GameObject particle;
 
     private BoxCollider2D boxCollider;
 
@@ -55,11 +57,7 @@ public class TNTExplosion : MonoBehaviour
             }
         }
 
+        Instantiate(particle, transform.position, Quaternion.identity);
         Destroy(gameObject);
-    }
-
-    void OnDrawGizmost()
-    {
-        Gizmos.DrawSphere(transform.position + Vector3.right*0.5f + Vector3.up * 0.5f, 0.1f);
     }
 }

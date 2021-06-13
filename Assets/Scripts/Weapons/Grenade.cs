@@ -12,6 +12,7 @@ public class Grenade : Weapon
         player = transform.parent.GetComponent<PlayerScript>();
         player.weapon = this;
         scale = transform.localScale;
+        destoryTime = player.playerAnimation.throwAnimationTime * 0.8f;
     }
 
     public override void Fire(MyInput input)

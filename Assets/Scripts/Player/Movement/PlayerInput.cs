@@ -2,10 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using MLAPI;
-using MLAPI.Messaging;
-using MLAPI.NetworkVariable;
-
 public class PlayerInput : MonoBehaviour
 {
     //Components
@@ -36,5 +32,8 @@ public class PlayerInput : MonoBehaviour
         input.jumping = UnityEngine.Input.GetButton("Jump1");
         input.backflip = UnityEngine.Input.GetButton("Backflip1");
         input.frontflip = UnityEngine.Input.GetButton("Frontflip1");
+        input.fire = UnityEngine.Input.GetAxis("Fire1");
+        Vector2 direction = (Vector2)(Camera.main.ScreenToWorldPoint(Input.mousePosition) - player.transform.position).normalized;
+        input.aim = direction;
     }
 }

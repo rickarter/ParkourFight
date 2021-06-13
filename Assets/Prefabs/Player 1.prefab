@@ -1679,7 +1679,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2508335770076729890}
-  - component: {fileID: 1794622882677354997}
   - component: {fileID: 3641436477264803735}
   - component: {fileID: 3098455158249291978}
   - component: {fileID: 1275259086096296776}
@@ -1709,23 +1708,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1794622882677354997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7468459650913839895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NetworkInstanceId: 0
-  PrefabHash: 1897319656204293034
-  PrefabHashGenerator: Player
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
 --- !u!50 &3641436477264803735
 Rigidbody2D:
   serializedVersion: 4
@@ -1856,6 +1838,7 @@ MonoBehaviour:
   playerInput: {fileID: 7743034159587886996}
   playerAnimation: {fileID: 4295158830913324502}
   playerStunts: {fileID: 1987424536004746685}
+  health: 100
   weapon: {fileID: 0}
 --- !u!1 &7600203197393976434
 GameObject:

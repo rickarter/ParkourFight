@@ -13,6 +13,8 @@ public class Weapon : MonoBehaviour
     public float recoil = 100f;
     public float delay = 0;
     public bool readyToShoot = true;
+
+    public float destoryTime = 0f;
     
     protected Vector3 scale;
 
@@ -46,7 +48,7 @@ public class Weapon : MonoBehaviour
         if(ammo <= 0)
         {
             player.weapon = null;
-            Destroy(this.gameObject);
+            Destroy(this.gameObject, destoryTime);
         }
     }
 
@@ -57,13 +59,6 @@ public class Weapon : MonoBehaviour
 
     public virtual void Rotate(Vector2 direction)
     {
-        /*if(direction.x != 0 && direction.y != 0)
-            transform.right = direction;
-            Vector3 parentScale = transform.parent.localScale;
-            transform.localScale = new Vector3(
-                Mathf.Sign(parentScale.x) * scale.x,
-                Mathf.Sign(parentScale.x) * scale.y,
-                Mathf.Sign(parentScale.z) * scale.z
-            );*/
+        
     }
 }
