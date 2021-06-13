@@ -35,8 +35,6 @@ public class Explosion : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        // if(other.gameObject.CompareTag("Player")) return;
-
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explostionRadius);
 
         foreach(Collider2D collider in colliders)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Teleport : MonoBehaviour
 {
-    private GameObject player;
+    public GameObject player;
 
     private BoxCollider2D boxCollider;
 
@@ -21,24 +21,10 @@ public class Teleport : MonoBehaviour
         boxCollider.enabled = true;
     }
 
-    void Update()
-    {
-        Debug.Log(player);
-    }
-
     void OnCollisionEnter2D(Collision2D other)
     {
-        // if(other.gameObject.CompareTag("Player")) return;
-
-        Debug.Log(this.player);
+        player.transform.position = transform.position;
 
         Destroy(gameObject);
-    }
-
-    public void SetPlayer(GameObject player)
-    {
-        this.player = player;
-        Debug.Log("is set");
-        Debug.Log(this.player);
     }
 }

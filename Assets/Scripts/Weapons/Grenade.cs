@@ -18,7 +18,7 @@ public class Grenade : Weapon
     public override void Fire(MyInput input)
     {
         player.playerAnimation.ThrowAnimation();
-        Invoke(nameof(ThrowGrenade), player.playerAnimation.throwAnimationTime * 0.8f);
+        Invoke(nameof(Throw), player.playerAnimation.throwAnimationTime * 0.8f);
 
         base.Fire(input);
     }
@@ -51,7 +51,7 @@ public class Grenade : Weapon
         Fire(player.playerInput.input);
     }
 
-    void ThrowGrenade()
+    virtual public void Throw()
     {
         Vector2 direction = player.playerInput.input.aim;
         if(direction.x == 0 && direction.y == 0) direction = player.rigidBody.velocity.normalized;

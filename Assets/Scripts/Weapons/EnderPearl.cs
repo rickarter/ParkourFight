@@ -11,25 +11,16 @@ public class EnderPearl : Grenade
         scale = transform.localScale;
         destoryTime = player.playerAnimation.throwAnimationTime * 0.8f;
     }
-    public override void Fire(MyInput input)
-    {
-        player.playerAnimation.ThrowAnimation();
-        Invoke(nameof(ThrowPearl), player.playerAnimation.throwAnimationTime * 0.8f);
 
-        base.Fire(input);
-    }
-
-    public void ThrowPearl()
+    public override void Throw()
     {
         Vector2 direction = player.playerInput.input.aim;
         if(direction.x == 0 && direction.y == 0) direction = player.rigidBody.velocity.normalized;
         GameObject grenade = Instantiate(projectile, transform.position, Quaternion.identity);
 
-        grenade.SetActive(false);
-        grenade.GetComponent<Teleport>().SetPlayer(player.gameObject);
-        
-        // grenade.SetActive(true);
-        grenade.GetComponent<Rigidbody2D>().velocity = player.rigidBody.velocity;
+        grenade.GetComponent<Teleport>().player = player.gameObject; 
+        if(Vector2.Dot(direction, grenade.GetComponent<Rigidbody2D>().velocity) >= 0)
+            grenade.GetComponent<Rigidbody2D>().velocity = player.rigidBody.velocity;
         grenade.GetComponent<Rigidbody2D>().AddForce(throwForce * direction);
     }
 }
