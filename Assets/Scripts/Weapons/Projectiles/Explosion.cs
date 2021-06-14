@@ -59,7 +59,7 @@ public class Explosion : MonoBehaviour
                 }
             }
         }
-
+        GameObject.FindObjectOfType<CameraShake>().StartShaking();
         Instantiate(particle, transform.position, Quaternion.identity);
         Destroy(gameObject);
     }

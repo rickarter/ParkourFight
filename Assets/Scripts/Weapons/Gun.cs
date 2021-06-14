@@ -12,6 +12,8 @@ public class Gun : Weapon
         projectile.GetComponent<Rigidbody2D>().AddForce(transform.right * shootForce);
         player.rigidBody.AddForce(-transform.right * recoil);
 
+        GameObject.FindObjectOfType<CameraShake>().StartShaking();
+
         base.Fire(input);
     }
 
