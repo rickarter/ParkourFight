@@ -12,7 +12,8 @@ public class Weapon : MonoBehaviour
     public Transform tip;
     public float recoil = 100f;
     public float delay = 0;
-    public bool readyToShoot = true;
+    public float shootForce = 2000f;
+    protected bool readyToShoot = true;
 
     public float destoryTime = 0f;
     
@@ -41,7 +42,6 @@ public class Weapon : MonoBehaviour
 
     public virtual void Fire(MyInput input)
     {
-
         readyToShoot = false;
         Invoke(nameof(Reload), delay);
         ammo--;

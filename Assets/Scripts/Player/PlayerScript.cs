@@ -13,9 +13,6 @@ public class PlayerScript : MonoBehaviour
     public PlayerAnimation playerAnimation;
     public PlayerStunts playerStunts;
 
-    [SerializeField]
-    private int health = 100;
-
     public Weapon weapon;
 
     void Reset()
@@ -38,10 +35,5 @@ public class PlayerScript : MonoBehaviour
 
         playerMovement.Movement(input);
         playerStunts.Stunts(input);
-    }
-    
-    public void TakeDamage(int damage)
-    {
-        health -= damage;
     }
 }

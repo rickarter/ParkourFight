@@ -19,8 +19,7 @@ public class EnderPearl : Grenade
         GameObject grenade = Instantiate(projectile, transform.position, Quaternion.identity);
 
         grenade.GetComponent<Teleport>().player = player.gameObject; 
-        if(Vector2.Dot(direction, grenade.GetComponent<Rigidbody2D>().velocity) >= 0)
-            grenade.GetComponent<Rigidbody2D>().velocity = player.rigidBody.velocity;
+        grenade.GetComponent<Rigidbody2D>().velocity = player.rigidBody.velocity;
         grenade.GetComponent<Rigidbody2D>().AddForce(throwForce * direction);
     }
 }

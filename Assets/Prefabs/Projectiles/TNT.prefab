@@ -147,5 +147,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explosionForce: 2000
   explostionRadius: 4
-  damage: 20
+  whatIsTrigger:
+    serializedVersion: 2
+    m_Bits: 2147483647
+  damage: 35
   particle: {fileID: 2584679338236921218, guid: c8378de06950647458b43937df94ada1, type: 3}
