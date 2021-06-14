@@ -93,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
         else 
         {
             player.rigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
-            // player.rigidBody.rotation = Mathf.LerpAngle(player.rigidBody.rotation, 0, Time.fixedDeltaTime*5);
+            player.rigidBody.rotation = Mathf.LerpAngle(player.rigidBody.rotation, 0, Time.fixedDeltaTime*5);
         }
 
         if (grounded && jumping) Jump();

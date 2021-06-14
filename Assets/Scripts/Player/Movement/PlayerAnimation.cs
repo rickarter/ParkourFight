@@ -132,7 +132,7 @@ public class PlayerAnimation : MonoBehaviour
 
     public void WieldAnimation()
     {
-        wield = true;    
+        wield = true;
         frontArmEffectorO.transform.parent.gameObject.SetActive(true);
     }
 

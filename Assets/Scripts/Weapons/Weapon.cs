@@ -29,6 +29,7 @@ public class Weapon : MonoBehaviour
 
     void OnDestroy()
     {
+        player.weapon = null;
         player.playerAnimation.StopWieldAnimation();
     }
 
@@ -47,7 +48,6 @@ public class Weapon : MonoBehaviour
         ammo--;
         if(ammo <= 0)
         {
-            player.weapon = null;
             Destroy(this.gameObject, destoryTime);
         }
     }

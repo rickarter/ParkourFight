@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class WeaponBox : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public List<GameObject> weapons;
+
+    void OnCollisionEnter2D(Collision2D other)
     {
-        
+        if(!other.gameObject.CompareTag("Player")) return;
+
+        if(other.gameObject.GetComponent<PlayerScript>().weapon != null)
+            Destroy(other.gameObject.GetComponent<PlayerScript>().weapon.gameObject);
+
+            IEnumerator coroutine = GiveWeapon(other);
+            StartCoroutine(coroutine);
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator GiveWeapon(Collision2D player)
     {
-        
+        yield return 0;
+
+        int slot = Random.Range(0, weapons.Count);
+        GameObject weapon = Instantiate(weapons[slot], player.transform);
+        Destroy(gameObject);
     }
 }

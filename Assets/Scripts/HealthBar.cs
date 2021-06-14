@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class HealthBar : MonoBehaviour
 {
-    public float health = 100f;
+    public int health = 100;
+    private int maxHealth;
     public bool isAlive
     {
         get
@@ -13,9 +14,19 @@ public class HealthBar : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        maxHealth = health;
+    }
+
     public void TakeDamage(int damage)
     {
         health -= damage;
-        health = Mathf.Clamp(health, 0, Mathf.Infinity);
+        health = (int)Mathf.Clamp(health, 0, Mathf.Infinity);
+    }
+
+    public void Heal()
+    {
+        health = maxHealth;
     }
 }
