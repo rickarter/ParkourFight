@@ -14,15 +14,22 @@ public class HealthBar : MonoBehaviour
         }
     }
 
+    private AudioSource audioSource;
+    public AudioClip audioClip;
+
     void Start()
     {
         maxHealth = health;
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void TakeDamage(int damage)
     {
         health -= damage;
         health = (int)Mathf.Clamp(health, 0, Mathf.Infinity);
+
+        audioSource.clip = audioClip;
+        audioSource.Play();
     }
 
     public void Heal()

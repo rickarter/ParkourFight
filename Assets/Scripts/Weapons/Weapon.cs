@@ -35,6 +35,7 @@ public class Weapon : MonoBehaviour
 
     public void FixedUpdate()
     {
+        if(player == null) return;
         Rotate(player.playerInput.input.aim);
 
         if(player.playerInput.input.fire == 0  || !readyToShoot) return;

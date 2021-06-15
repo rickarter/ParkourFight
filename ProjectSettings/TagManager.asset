@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Level
+  - Destructable
+  - LootBox
   layers:
   - Default
   - TransparentFX

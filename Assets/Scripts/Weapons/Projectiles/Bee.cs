@@ -46,7 +46,7 @@ public class Bee : MonoBehaviour
         else if(!health.isAlive)
         {
             float t = (Time.time - deathTime) / deathDurationTime;
-            if(t > 1) Destroy(gameObject);
+            if(t > 1 && !GetComponent<AudioSource>().isPlaying) Destroy(gameObject);
 
             spriteMaterial.SetFloat("_FadeAmount", t);
         }

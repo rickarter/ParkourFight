@@ -12,6 +12,7 @@ public class Explosion : MonoBehaviour
     public int damage = 30;
 
     public GameObject particle;
+    public GameObject destructionParticle;
 
     private BoxCollider2D boxCollider;
 
@@ -56,6 +57,10 @@ public class Explosion : MonoBehaviour
                 if(hit.transform.TryGetComponent<HealthBar>(out var health))
                 {
                     health.TakeDamage(damage);
+                }
+                if(collider.transform.TryGetComponent<Destruction>(out var destruction))
+                {
+                    destruction.Destruct();
                 }
             }
         }

@@ -43,9 +43,14 @@ public class PlayerAnimation : MonoBehaviour
     private float throwStartTime;
     public float throwAnimationTime = 0.3f;
 
+        //Sounds
+    private AudioSource audioSource;
+    public AudioClip stepSound;
+
     void Start()
     {
         player = GetComponent<PlayerScript>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -61,7 +66,15 @@ public class PlayerAnimation : MonoBehaviour
 
         string newState = currentState;
         bool isMoving = Mathf.Abs(player.rigidBody.velocity.x) > 0.05f && player.playerInput.input.x != 0;
-        if(isMoving && player.playerMovement.grounded) newState = RUN;
+        if(isMoving && player.playerMovement.grounded)
+        {
+            if(!audioSource.isPlaying)
+            {
+                audioSource.clip = stepSound;
+                audioSource.Play();
+            }
+            newState = RUN;
+        }
         else if(!isMoving && player.playerMovement.grounded) newState = IDLE;
         else if(!player.playerMovement.grounded) newState = FLOATING;
 
