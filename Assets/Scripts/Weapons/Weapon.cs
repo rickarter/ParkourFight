@@ -49,7 +49,7 @@ public class Weapon : MonoBehaviour
         ammo--;
         if(ammo <= 0)
         {
-            Destroy(this.gameObject, destoryTime);
+            StartCoroutine(nameof(DestroyWeapon));
         }
     }
 
@@ -61,5 +61,11 @@ public class Weapon : MonoBehaviour
     public virtual void Rotate(Vector2 direction)
     {
         
+    }
+
+    IEnumerator DestroyWeapon()
+    {
+        yield return 0;
+        Destroy(this.gameObject, destoryTime);
     }
 }

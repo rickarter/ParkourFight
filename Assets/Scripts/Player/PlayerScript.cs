@@ -12,6 +12,7 @@ public class PlayerScript : MonoBehaviour
     public PlayerInput playerInput;
     public PlayerAnimation playerAnimation;
     public PlayerStunts playerStunts;
+    public HealthBar healthBar;
 
     public Weapon weapon;
 
@@ -22,6 +23,7 @@ public class PlayerScript : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         playerAnimation = GetComponent<PlayerAnimation>();
         playerStunts = GetComponent<PlayerStunts>();
+        healthBar = GetComponent<HealthBar>();
     }
 
     void Awake()

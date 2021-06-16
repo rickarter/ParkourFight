@@ -111,7 +111,7 @@ public class PlayerMovement : MonoBehaviour
             multiplier = 0.3f;
         }
 
-        player.rigidBody.AddForce(transform.right * x * moveSpeed * multiplier * Time.deltaTime);        
+        player.rigidBody.AddForce(Vector2.right * x * moveSpeed * multiplier * Time.deltaTime);        
     }
 
     void CounterMovement(float x, float y, Vector2 mag)

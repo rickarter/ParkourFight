@@ -7,7 +7,7 @@ public class Bee : MonoBehaviour
     private HealthBar health;
     private SpriteRenderer spriteRenderer;
     private Material spriteMaterial;
-    private Rigidbody2D rigidbody;
+    private new Rigidbody2D rigidbody;
 
     public float speed = 20;
     public float moveSpeed = 5f;

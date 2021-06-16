@@ -1689,7 +1689,7 @@ GameObject:
   - component: {fileID: 1814906144548841674}
   - component: {fileID: 8683482095524096390}
   m_Layer: 7
-  m_Name: Player
+  m_Name: Player 1
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1744,8 +1744,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.61}
-  m_Size: {x: 0.79, y: 3.2}
+  m_Offset: {x: 0, y: 0.5969418}
+  m_Size: {x: 0.79, y: 3.1738837}
   m_Direction: 0
 --- !u!114 &1275259086096296776
 MonoBehaviour:
@@ -1841,6 +1841,7 @@ MonoBehaviour:
   playerInput: {fileID: 7743034159587886996}
   playerAnimation: {fileID: 4295158830913324502}
   playerStunts: {fileID: 1987424536004746685}
+  healthBar: {fileID: 1814906144548841674}
   weapon: {fileID: 0}
 --- !u!114 &1814906144548841674
 MonoBehaviour:
