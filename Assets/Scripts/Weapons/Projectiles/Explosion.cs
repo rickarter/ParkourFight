@@ -16,6 +16,8 @@ public class Explosion : MonoBehaviour
 
     private BoxCollider2D boxCollider;
 
+    private bool collided = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,6 +45,8 @@ public class Explosion : MonoBehaviour
         
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explostionRadius);
 
+        var i = 0;
+
         foreach(Collider2D collider in colliders)
         {
             if(collider.gameObject != gameObject)
@@ -57,12 +61,16 @@ public class Explosion : MonoBehaviour
                 if(hit.transform.TryGetComponent<HealthBar>(out var health))
                 {
                     health.TakeDamage(damage);
+                    Debug.Log(health.gameObject.name);
+                    Debug.Log(Time.time);
+                    Debug.Log(i);
                 }
                 if(collider.transform.TryGetComponent<Destruction>(out var destruction))
                 {
                     destruction.Destruct();
                 }
             }
+            i++;
         }
         GameObject.FindObjectOfType<CameraShake>().StartShaking();
         Instantiate(particle, transform.position, Quaternion.identity);

@@ -65,7 +65,7 @@ public class Weapon : MonoBehaviour
 
     IEnumerator DestroyWeapon()
     {
-        yield return 0;
+        yield return new WaitForSeconds(0.01f);
         Destroy(this.gameObject, destoryTime);
     }
 }

@@ -39,13 +39,14 @@ public class Grenade : Weapon
     }
 
     void Update()
-    {
-        ToggleThrowing(player.playerInput.input.fire > 0);
+    {   
+        
     }
 
     new void FixedUpdate()
     {
         Rotate(player.playerInput.input.aim);
+        ToggleThrowing(player.playerInput.input.fire > 0);
 
         if(!throwing  || !readyToShoot) return;
         Fire(player.playerInput.input);

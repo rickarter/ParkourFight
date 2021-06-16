@@ -19,7 +19,7 @@ public class WeaponBox : MonoBehaviour
 
     IEnumerator GiveWeapon(Collision2D player)
     {
-        yield return 0;
+        yield return 1;
 
         int slot = Random.Range(0, weapons.Count);
         GameObject weapon = Instantiate(weapons[slot], player.transform);

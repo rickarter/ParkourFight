@@ -26,7 +26,7 @@ public class PlayerScript : MonoBehaviour
         healthBar = GetComponent<HealthBar>();
     }
 
-    void Awake()
+    void Start()
     {
         Reset();
     }

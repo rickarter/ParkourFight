@@ -28,6 +28,9 @@ public class HealthBar : MonoBehaviour
         health -= damage;
         health = (int)Mathf.Clamp(health, 0, Mathf.Infinity);
 
+        // if(this.gameObject.CompareTag("Player"))
+        // Debug.Log("took damage" + damage.ToString());
+
         audioSource.clip = audioClip;
         audioSource.Play();
     }

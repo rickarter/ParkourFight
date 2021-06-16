@@ -8,6 +8,7 @@ public class LevelGenerator : EditorWindow
 {
     private Texture2D map;
     private ColorMappings mappings;
+    private GameObject levelController;
 
     private GameObject levelGroup;
 
@@ -21,6 +22,7 @@ public class LevelGenerator : EditorWindow
     {
         map = (Texture2D)EditorGUILayout.ObjectField("Map", map, typeof(Texture2D), false);
         mappings = (ColorMappings)EditorGUILayout.ObjectField("ColorMappings", mappings, typeof(ColorMappings), false);
+        levelController = (GameObject)EditorGUILayout.ObjectField("Level controller", levelController, typeof(GameObject), false);
 
         if(GUILayout.Button("Generate from texture"))
         {
@@ -36,6 +38,8 @@ public class LevelGenerator : EditorWindow
     {
         levelGroup = new GameObject();
         levelGroup.name = "Generated level";
+        
+        Instantiate(levelController, Vector3.zero, Quaternion.identity, levelGroup.transform);
 
         for(int x = 0; x < map.width; x++)
         {
@@ -58,7 +62,10 @@ public class LevelGenerator : EditorWindow
             {
                 Vector2 position = new Vector2(x * 1.59f, y * 1.59f);
                 if(colorMapping.prefab.CompareTag("Player") || colorMapping.prefab.CompareTag("LootBox"))
-                    Instantiate(colorMapping.prefab, position, Quaternion.identity);
+                {
+                    GameObject gameObject = Instantiate(colorMapping.prefab, position, Quaternion.identity, levelGroup.transform);
+                    gameObject.name = colorMapping.prefab.name;
+                } 
                 else
                     Instantiate(colorMapping.prefab, position, Quaternion.identity, levelGroup.transform);
             }

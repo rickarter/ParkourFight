@@ -54,7 +54,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -105,7 +105,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!61 &924678978003298764
 BoxCollider2D:
@@ -152,3 +152,4 @@ MonoBehaviour:
     m_Bits: 128
   damage: 35
   particle: {fileID: 82187267195811194, guid: 4927ed3af9f741d499f07a1ec49d3fe5, type: 3}
+  destructionParticle: {fileID: 0}

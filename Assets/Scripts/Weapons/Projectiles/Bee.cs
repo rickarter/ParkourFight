@@ -103,10 +103,21 @@ public class Bee : MonoBehaviour
 
         if(other.gameObject.TryGetComponent<HealthBar>(out var health))
         {
-            health.TakeDamage(damage);
-            this.health.TakeDamage(100);
-            deathTime = Time.time;
-            GetComponent<BoxCollider2D>().enabled = false;
+            IEnumerator coroutine = Damage(health);
+            StartCoroutine(coroutine);
         }
+    }
+
+    IEnumerator Damage(HealthBar health)
+    {
+        yield return 0;
+
+        health.TakeDamage(damage);
+        this.health.TakeDamage(100);
+
+        deathTime = Time.time;
+        GetComponent<BoxCollider2D>().enabled = false;
+
+
     }
 }
