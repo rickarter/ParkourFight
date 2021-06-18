@@ -8,6 +8,7 @@ public class Bee : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Material spriteMaterial;
     private new Rigidbody2D rigidbody;
+    private BoxCollider2D boxCollider;
 
     public float speed = 20;
     public float moveSpeed = 5f;
@@ -29,7 +30,15 @@ public class Bee : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteMaterial = spriteRenderer.material;
         rigidbody = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
+        boxCollider.enabled = false;
         Invoke(nameof(StartAttack), sleepTime);
+        Invoke(nameof(EnableCollider), 0.25f);
+    }
+
+    void EnableCollider()
+    {
+        boxCollider.enabled = true;
     }
 
     // Update is called once per frame
@@ -117,7 +126,5 @@ public class Bee : MonoBehaviour
 
         deathTime = Time.time;
         GetComponent<BoxCollider2D>().enabled = false;
-
-
     }
 }

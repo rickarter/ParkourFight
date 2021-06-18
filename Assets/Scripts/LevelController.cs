@@ -109,6 +109,6 @@ public class LevelController : MonoBehaviour
     void LoadRandomLevel()
     {
         Time.timeScale = 1;
-        SceneManager.LoadScene(Random.Range(0, SceneManager.sceneCountInBuildSettings-1));
+        SceneManager.LoadScene(Random.Range(0, SceneManager.sceneCountInBuildSettings));
     }
 }
