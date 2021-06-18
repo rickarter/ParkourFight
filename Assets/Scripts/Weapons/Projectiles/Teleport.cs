@@ -31,6 +31,8 @@ public class Teleport : MonoBehaviour
             health.TakeDamage(damage);
         }
 
+        player.GetComponent<PlayerScript>().healthBar.TakeDamage(0);
+
         Destroy(gameObject);
     }
 }

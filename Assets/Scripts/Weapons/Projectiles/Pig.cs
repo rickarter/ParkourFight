@@ -11,10 +11,10 @@ public class Pig : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Invoke(nameof(DestroyPig), lifeTime);
+        // Invoke(nameof(DestroyPig), lifeTime);
         boxCollider = GetComponent<BoxCollider2D>();
         boxCollider.enabled = false;
-        Invoke(nameof(EnableCollider), 0.25f);
+        Invoke(nameof(EnableCollider), 0.125f);
     }
 
     void EnableCollider()
@@ -29,21 +29,24 @@ public class Pig : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if(!other.gameObject.CompareTag("Player")) return;
+        if(other.gameObject.CompareTag("Pig")) return;
 
         if(other.gameObject.TryGetComponent<HealthBar>(out var health))
         {
-            IEnumerator coroutine = Damage(health);
-            StartCoroutine(coroutine);
+            // IEnumerator coroutine = Damage(health);
+            // StartCoroutine(coroutine);
+            health.TakeDamage(damage);
         }
+
+        Destroy(gameObject);
     }
 
-    IEnumerator Damage(HealthBar health)
+    /*IEnumerator Damage(HealthBar health)
     {
         yield return 0;
 
         health.TakeDamage(damage);
 
         Destroy(gameObject);
-    }
+    }*/
 }

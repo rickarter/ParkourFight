@@ -27,3 +27,7 @@ MonoBehaviour:
     prefab: {fileID: 8573910617881553146, guid: 98dbabfd9d46c6146b35ed9cd6e6b46d, type: 3}
   - color: {r: 1, g: 0, b: 0, a: 1}
     prefab: {fileID: 7206324393690980612, guid: f4d46991a9cabf14a8388dc063049570, type: 3}
+  - color: {r: 0.39215687, g: 0.19607843, b: 0.19607843, a: 1}
+    prefab: {fileID: 7405663369797088642, guid: b01fcd5a690004548869a30b1e2fcdbf, type: 3}
+  - color: {r: 0.19607843, g: 0.5882353, b: 0.39215687, a: 1}
+    prefab: {fileID: 4072783056030363954, guid: 1d0adb866a6732048b0bb738c8038ebe, type: 3}

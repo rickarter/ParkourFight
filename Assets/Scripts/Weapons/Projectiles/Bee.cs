@@ -42,15 +42,19 @@ public class Bee : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(isAttacking && health.isAlive)
         {
-            if(target == null) FindTarget();
+            /*if(target == null) FindTarget();
             else
             {
                 AttackTarget();
-            }
+            }*/
+            FindTarget();
+
+            if(target != null)
+                AttackTarget();
         }
         else if(!health.isAlive)
         {
@@ -93,9 +97,10 @@ public class Bee : MonoBehaviour
         spriteRenderer.flipY = Vector3.Dot(direction, Vector3.right) < 0;
         transform.right = direction.normalized;
 
-        if(rigidbody.velocity.magnitude > speed) return;
+        // if(rigidbody.velocity.magnitude > speed) return;
         float multiplier = 1;
         if(Vector3.Dot(direction, rigidbody.velocity) < 0) multiplier = 5;
+        else if(rigidbody.velocity.magnitude > speed) return;
         rigidbody.AddForce(direction * moveSpeed * multiplier);
 
 
