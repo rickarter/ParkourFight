@@ -32,7 +32,7 @@ public class BoxSpawner : MonoBehaviour
 
 
         if(currentBox == null)
-            currentBox = Instantiate(box, transform.position, Quaternion.identity);
+            currentBox = Instantiate(box, transform.position, Quaternion.identity, transform);
 
         float time = Random.Range(minTime, maxTime);
         Invoke(nameof(SpawnBox), time);

@@ -39,6 +39,8 @@ public class LevelController : MonoBehaviour
     private bool hasInvoked = false;
     public float invokeNewLevelTime = 1f;
 
+    private LevelBuilder levelBuilder;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -50,6 +52,8 @@ public class LevelController : MonoBehaviour
         vignette.intensity.value = vignetteValue;
         chromaticAberration.intensity.value = chromaticAberrationValue;
         bloom.intensity.value = bloomValue;
+
+        levelBuilder = GameObject.FindObjectOfType<LevelBuilder>();
     }
 
     // Update is called once per frame
@@ -109,6 +113,8 @@ public class LevelController : MonoBehaviour
     void LoadRandomLevel()
     {
         Time.timeScale = 1;
-        SceneManager.LoadScene(Random.Range(0, SceneManager.sceneCountInBuildSettings));
+        // SceneManager.LoadScene(Random.Range(0, SceneManager.sceneCountInBuildSettings));
+        // levelBuilder.GenerateLevel(Random.Range(0, levelBuilder.maps.Length));
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
