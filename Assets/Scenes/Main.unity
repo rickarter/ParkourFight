@@ -163,6 +163,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 621cbf82bd3ec0c478511cbc7c373511, type: 3}
   - {fileID: 2800000, guid: 50919660587aa0742a02feb7891701cf, type: 3}
   - {fileID: 2800000, guid: a4284f1c2913ea04db39c35955304545, type: 3}
+  - {fileID: 2800000, guid: 34c9af9ed4d09c049b454e77dd82916b, type: 3}
   mappings: {fileID: 11400000, guid: 093915f6c1fd4634a87ce9e09ca24796, type: 2}
   levelController: {fileID: 6196701039878661238, guid: 14c86f7b80fcc864fb792fc9c11ab1bc, type: 3}
 --- !u!4 &2061165003

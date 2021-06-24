@@ -102,7 +102,6 @@ public class LevelController : MonoBehaviour
         if(other.gameObject.CompareTag("Player"))
         {
             other.GetComponent<HealthBar>().TakeDamage(100);
-            Debug.Log("UWo");
         }
         else
         {

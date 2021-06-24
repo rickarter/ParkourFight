@@ -22,8 +22,10 @@ public class Explosion : MonoBehaviour
     void Start()
     {
         boxCollider = GetComponent<BoxCollider2D>();
-        boxCollider.enabled = false;
 
+        if(boxCollider == null) return;
+
+        boxCollider.enabled = false;
         Invoke(nameof(EnableCollider), 0.125f);
     }
 

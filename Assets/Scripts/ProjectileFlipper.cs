@@ -4,17 +4,26 @@ using UnityEngine;
 
 public class ProjectileFlipper : MonoBehaviour
 {
-    private Rigidbody2D rigidbody;
+    public bool flipX = true;
+
+    private new Rigidbody2D rigidbody;
     private SpriteRenderer spriteRenderer;
+
+    private Vector3 scale;
 
     void Start()
     {
         rigidbody = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        scale = transform.localScale;
     }
 
     void FixedUpdate()
     {
-        spriteRenderer.flipX = rigidbody.velocity.x < 0;
+        if(flipX)
+            spriteRenderer.flipX = rigidbody.velocity.x < 0;
+        else
+            transform.localScale = new Vector3(scale.x, rigidbody.velocity.x < 0 ? -scale.y : scale.y, scale.z);
     }
 }

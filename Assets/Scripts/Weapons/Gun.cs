@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class Gun : Weapon
 {
+    public bool keepRotation = false;
     public override void Fire(MyInput input)
     {
         if(input.fire == 0) return;
 
         GameObject projectile = Instantiate(this.projectile, tip.position, Quaternion.identity);
+        if(keepRotation) projectile.transform.right = transform.right;
         projectile.GetComponent<Rigidbody2D>().AddForce(transform.right * shootForce);
         player.rigidBody.AddForce(-transform.right * recoil);
 
