@@ -99,4 +99,4 @@ MonoBehaviour:
   minTime: 10
   maxTime: 60
   destination: {x: 0, y: 0, z: 0}
-  maxOffset: 15
+  maxOffset: 10
